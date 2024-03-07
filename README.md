@@ -7,9 +7,10 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
 - feature parity with Dotgrid
 - resizable window
 - more layers
-- ability to edit existing segment
-- ability to use other tags like `<rect>` and `<circle>`
+- edit existing segment
+- use other tags like `<rect>` and `<circle>`
 - language-agnostic icons instead of words in menu(also maybe)
+- `H` and `V` for cardinal lines
 
 ## Why?
 Dotgrid is an amazing tool for making simple SVG icons but I find myself wanting more out of it. The exports are also bigger than they need to be. There are also a few bugs that I want to get rid of but the original code is a little messy(and it doesn't seem like updates are happening anymore) from Hundred Rabbits so I'm starting from scratch instead.
