@@ -15,7 +15,7 @@
     height = "80vh",
     background = "#eee",
     // settings
-    grid = { x: 0, y: 0, shown: true },
+    grid = { x: 0, y: 0, shown: true, spacing: 15 },
     scale = { val: 1, min: 1, max: 5 },
     // drawn path properties
     points = [],
@@ -52,18 +52,16 @@
     let h = Math.trunc(rect.height);
     canvas.width = w - (w % 3);
     canvas.height = h - (h % 3);
-    grid.x = Math.trunc(canvas.width / 15);
-    grid.y = Math.trunc(canvas.height / 15);
+    grid.x = Math.trunc(canvas.width / grid.spacing);
+    grid.y = Math.trunc(canvas.height / grid.spacing);
 
+    // draw grid markers
     if (grid.shown) {
       context.beginPath();
       for (let x = 1; x < grid.x / scale.val; x++) {
         for (let y = 1; y < grid.y / scale.val; y++) {
           const thick_dot = x % 4 === 0 && y % 4 === 0;
-          const pos = {
-            x: x * 15,
-            y: y * 15,
-          };
+          const pos = { x: x * grid.spacing, y: y * grid.spacing };
           const radius = thick_dot ? 2 : 1;
           context.moveTo(pos.x * scale.val, pos.y * scale.val);
           context.arc(
@@ -80,6 +78,7 @@
       context.fill();
       context.closePath();
     }
+    // end - draw grid markers
   }
 
   /**
