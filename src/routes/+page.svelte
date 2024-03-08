@@ -81,10 +81,12 @@
     // draw cursor
     context.beginPath();
     context.lineWidth = scale.val;
+    // better aligns the drawn cursor to the mouse pointer
+    let offset = { x: mouse.x + 15, y: mouse.y + 15 };
     context.arc(
-      mouse.x - (mouse.x % (grid.spacing * scale.val)),
-      mouse.y - (mouse.y % (grid.spacing * scale.val)),
-      8 * scale.val,
+      offset.x - (offset.x % (grid.spacing * scale.val)),
+      offset.y - (offset.y % (grid.spacing * scale.val)),
+      7.5 * scale.val,
       0,
       2 * Math.PI,
       false,
@@ -98,10 +100,8 @@
    * moves the canvas cursor to the closest marker
    */
   function mousemove(event) {
-    if (dev) {
-      mouse.x = Math.trunc(event.clientX - rect.left);
-      mouse.y = Math.trunc(event.clientY - rect.top);
-    }
+    mouse.x = Math.trunc(event.clientX - rect.left);
+    mouse.y = Math.trunc(event.clientY - rect.top);
   }
 
   /**
