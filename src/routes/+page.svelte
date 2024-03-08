@@ -147,13 +147,22 @@
   }
 
   /**
-   * zoom in and out(maybe)
+   * zoom grid in and out
+   * `scale.val` mul'd by 10 and +/- 1 before being div'd by 10
+   * to avoid floating-point presicion issues from `[+-]= 0.1`
    */
   function wheel(event) {
     if (event.deltaY < 0 && scale.val < scale.max) {
-      scale.val += 0.1;
-    } else if (scale.val > scale.min) {
-      scale.val -= 0.1;
+      scale.val *= 10;
+      scale.val += 1;
+      scale.val = Math.trunc(scale.val);
+      scale.val /= 10;
+      // console.log(scale.val)
+    } else if (event.deltaY > 0 && scale.val > scale.min) {
+      scale.val *= 10;
+      scale.val -= 1;
+      scale.val = Math.trunc(scale.val);
+      scale.val /= 10;
     }
   }
 
