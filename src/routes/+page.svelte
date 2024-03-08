@@ -14,19 +14,17 @@
     width = "80vw",
     height = "80vh",
     background = "#eee",
-    // settings
+    // settings & state
     grid = { x: 0, y: 0, shown: true, spacing: 15 },
     scale = { val: 1, min: 1, max: 5 },
-    // drawn path properties
+    mouse = { x: 0, y: 0 },
+    lastAction,
     points = [],
     segments = [],
     // exported svg properties
     fill = "none",
     stroke = "#000",
-    viewBox = "",
-    // dev
-    lastAction,
-    mouse = { x: null, y: null };
+    viewBox = "";
 
   /**
    * runs when canvas var is binded to <canvas>
@@ -35,7 +33,7 @@
    */
   $: if (
     canvas &&
-    (innerWidth || innerHeight || width || height || grid || scale)
+    (innerWidth || innerHeight || width || height || grid || scale || mouse)
   ) {
     context = canvas.getContext("2d");
     rect = canvas.getBoundingClientRect();
@@ -79,10 +77,25 @@
       context.closePath();
     }
     // end - draw grid markers
+
+    // draw cursor
+    context.beginPath();
+    context.lineWidth = scale.val;
+    context.arc(
+      mouse.x - (mouse.x % (grid.spacing * scale.val)),
+      mouse.y - (mouse.y % (grid.spacing * scale.val)),
+      8 * scale.val,
+      0,
+      2 * Math.PI,
+      false,
+    );
+    context.stroke();
+    context.closePath();
+    // end - draw cursor
   }
 
   /**
-   * moves the canvas cursor to the closest vertex
+   * moves the canvas cursor to the closest marker
    */
   function mousemove(event) {
     if (dev) {
@@ -181,7 +194,12 @@ which is used to determine the number of grid markers to show on screen
 </button>
 
 {#if dev}
-  <p style:margin="0">x: {mouse.x}, y: {mouse.y}</p>
+  <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
+  <p style:margin="0">
+    marker pos: x: {(mouse.x - (mouse.x % grid.spacing)) / grid.spacing}, y: {(mouse.y -
+      (mouse.y % grid.spacing)) /
+      grid.spacing}
+  </p>
   <p style:margin="0">last action: {lastAction}</p>
   <p style:margin="0">scale: {scale.val}</p>
 
