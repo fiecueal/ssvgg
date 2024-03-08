@@ -172,7 +172,7 @@ differ from canvas internal width and height(set in draw() function)
 which is used to determine the number of grid markers to show on screen
 -->
 <canvas
-  style="display: block; margin: auto; padding: 1rem"
+  style="display: block; margin: auto"
   style:width
   style:height
   style:background
