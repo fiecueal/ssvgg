@@ -82,11 +82,15 @@
     context.beginPath();
     context.lineWidth = scale.val;
     // better aligns the drawn cursor to the mouse pointer
-    let offset = { x: mouse.x + 15, y: mouse.y + 15 };
+    const pixelspacing = (grid.spacing / 2) * scale.val;
+    let offset = {
+      x: mouse.x + pixelspacing,
+      y: mouse.y + pixelspacing,
+    };
     context.arc(
       offset.x - (offset.x % (grid.spacing * scale.val)),
       offset.y - (offset.y % (grid.spacing * scale.val)),
-      7.5 * scale.val,
+      pixelspacing,
       0,
       2 * Math.PI,
       false,
