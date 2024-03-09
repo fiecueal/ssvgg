@@ -15,8 +15,9 @@
     height = "80vh",
     background = "#eee",
     // settings & state
-    grid = { x: 0, y: 0, shown: true, spacing: 15 },
+    grid = { x: 0, y: 0, shown: true },
     scale = { val: 1, min: 1, max: 5 },
+    spacing = { base: 15, scaled: 15 * scale.val },
     mouse = { x: 0, y: 0 },
     lastAction,
     points = [],
@@ -25,6 +26,8 @@
     fill = "none",
     stroke = "#000",
     viewBox = "";
+
+  $: spacing.scaled = spacing.base * scale.val;
 
   /**
    * runs when canvas var is binded to <canvas>
@@ -41,8 +44,8 @@
   }
 
   /**
-   * sets the canvas dimensions and draws the grid
-   * unless `grid.shown` is false
+   * sets the canvas dimensions and draws everything
+   * grid is drawn unless `grid.shown` is false
    */
   function draw() {
     // make the canvas dimensions divisible by 3
@@ -50,8 +53,8 @@
     let h = Math.trunc(rect.height);
     canvas.width = w - (w % 3);
     canvas.height = h - (h % 3);
-    grid.x = Math.trunc(canvas.width / grid.spacing);
-    grid.y = Math.trunc(canvas.height / grid.spacing);
+    grid.x = Math.trunc(canvas.width / spacing.base);
+    grid.y = Math.trunc(canvas.height / spacing.base);
 
     // draw grid markers
     if (grid.shown) {
@@ -59,17 +62,10 @@
       for (let x = 1; x < grid.x / scale.val; x++) {
         for (let y = 1; y < grid.y / scale.val; y++) {
           const thick_dot = x % 4 === 0 && y % 4 === 0;
-          const pos = { x: x * grid.spacing, y: y * grid.spacing };
+          const pos = { x: x * spacing.scaled, y: y * spacing.scaled };
           const radius = thick_dot ? 2 : 1;
-          context.moveTo(pos.x * scale.val, pos.y * scale.val);
-          context.arc(
-            pos.x * scale.val,
-            pos.y * scale.val,
-            radius * scale.val,
-            0,
-            2 * Math.PI,
-            false,
-          );
+          context.moveTo(pos.x, pos.y);
+          context.arc(pos.x, pos.y, radius * scale.val, 0, 2 * Math.PI, false);
         }
       }
       context.fillStyle = "darkgrey";
@@ -82,15 +78,14 @@
     context.beginPath();
     context.lineWidth = scale.val;
     // better aligns the drawn cursor to the mouse pointer
-    const pixelspacing = (grid.spacing / 2) * scale.val;
     let offset = {
-      x: mouse.x + pixelspacing,
-      y: mouse.y + pixelspacing,
+      x: mouse.x + spacing.scaled / 2,
+      y: mouse.y + spacing.scaled / 2,
     };
     context.arc(
-      offset.x - (offset.x % (grid.spacing * scale.val)),
-      offset.y - (offset.y % (grid.spacing * scale.val)),
-      pixelspacing,
+      offset.x - (offset.x % (spacing.scaled)),
+      offset.y - (offset.y % (spacing.scaled)),
+      spacing.scaled / 2,
       0,
       2 * Math.PI,
       false,
@@ -202,9 +197,9 @@ which is used to determine the number of grid markers to show on screen
 {#if dev}
   <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
   <p style:margin="0">
-    marker pos: x: {(mouse.x - (mouse.x % grid.spacing)) / grid.spacing}, y: {(mouse.y -
-      (mouse.y % grid.spacing)) /
-      grid.spacing}
+    marker pos: x: {(mouse.x - (mouse.x % spacing.base)) / spacing.base}, y: {(mouse.y -
+      (mouse.y % spacing.base)) /
+      spacing.base}
   </p>
   <p style:margin="0">last action: {lastAction}</p>
   <p style:margin="0">scale: {scale.val}</p>
