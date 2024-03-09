@@ -153,16 +153,9 @@
    */
   function wheel(event) {
     if (event.deltaY < 0 && scale.val < scale.max) {
-      scale.val *= 10;
-      scale.val += 1;
-      scale.val = Math.trunc(scale.val);
-      scale.val /= 10;
-      // console.log(scale.val)
+      scale.val = Math.trunc(scale.val * 10 + 1) / 10;
     } else if (event.deltaY > 0 && scale.val > scale.min) {
-      scale.val *= 10;
-      scale.val -= 1;
-      scale.val = Math.trunc(scale.val);
-      scale.val /= 10;
+      scale.val = Math.trunc(scale.val * 10 - 1) / 10;
     }
   }
 
