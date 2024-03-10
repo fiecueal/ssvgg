@@ -5,12 +5,9 @@
     innerWidth,
     innerHeight,
     // canvas html tag properties
-    /** @type {HTMLCanvasElement} */
-    canvas,
-    /** @type {CanvasRenderingContext2D} */
-    context,
-    /** @type {DOMRect} */
-    rect,
+    /** @type {HTMLCanvasElement} */ canvas,
+    /** @type {CanvasRenderingContext2D} */ context,
+    /** @type {DOMRect} */ rect,
     width = "80vw",
     height = "80vh",
     background = "#eee",
@@ -19,6 +16,11 @@
     scale = { val: 1, min: 1, max: 5 },
     spacing = { base: 15, scaled: 15 * scale.val },
     mouse = { x: 0, y: 0 },
+    // offset to make mouse pointer accurate to the position of the grid cursor circle
+    offset = {
+      x: mouse.x + spacing.scaled / 2,
+      y: mouse.y + spacing.scaled / 2,
+    },
     lastAction,
     points = [],
     segments = [],
@@ -28,6 +30,10 @@
     viewBox = "";
 
   $: spacing.scaled = spacing.base * scale.val;
+  $: offset = {
+    x: mouse.x + spacing.scaled / 2,
+    y: mouse.y + spacing.scaled / 2,
+  };
 
   /**
    * runs when canvas var is binded to <canvas>
@@ -78,13 +84,9 @@
     context.beginPath();
     context.lineWidth = scale.val;
     // better aligns the drawn cursor to the mouse pointer
-    let offset = {
-      x: mouse.x + spacing.scaled / 2,
-      y: mouse.y + spacing.scaled / 2,
-    };
     context.arc(
-      offset.x - (offset.x % (spacing.scaled)),
-      offset.y - (offset.y % (spacing.scaled)),
+      offset.x - (offset.x % spacing.scaled),
+      offset.y - (offset.y % spacing.scaled),
       spacing.scaled / 2,
       0,
       2 * Math.PI,
@@ -197,9 +199,9 @@ which is used to determine the number of grid markers to show on screen
 {#if dev}
   <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
   <p style:margin="0">
-    marker pos: x: {(mouse.x - (mouse.x % spacing.base)) / spacing.base}, y: {(mouse.y -
-      (mouse.y % spacing.base)) /
-      spacing.base}
+    cursor pos: x: {Math.trunc(
+      (offset.x - (offset.x % spacing.base)) / spacing.scaled,
+    )}, y: {Math.trunc((offset.y - (offset.y % spacing.base)) / spacing.scaled)}
   </p>
   <p style:margin="0">last action: {lastAction}</p>
   <p style:margin="0">scale: {scale.val}</p>
