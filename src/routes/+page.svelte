@@ -16,6 +16,7 @@
     scale = { val: 1, min: 1, max: 5 },
     spacing = { base: 15, scaled: 15 * scale.val },
     mouse = { x: 0, y: 0 },
+    cursor = { x: 1, y: 1 },
     // offset to make mouse pointer accurate to the position of the grid cursor circle
     offset = {
       x: mouse.x + spacing.scaled / 2,
@@ -103,6 +104,9 @@
   function mousemove(event) {
     mouse.x = Math.trunc(event.clientX - rect.left);
     mouse.y = Math.trunc(event.clientY - rect.top);
+
+    cursor.x = (offset.x - (offset.x % spacing.scaled)) / spacing.scaled;
+    cursor.y = (offset.y - (offset.y % spacing.scaled)) / spacing.scaled;
   }
 
   /**
@@ -198,11 +202,7 @@ which is used to determine the number of grid markers to show on screen
 
 {#if dev}
   <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
-  <p style:margin="0">
-    cursor pos: x: {Math.trunc(
-      (offset.x - (offset.x % spacing.base)) / spacing.scaled,
-    )}, y: {Math.trunc((offset.y - (offset.y % spacing.base)) / spacing.scaled)}
-  </p>
+  <p style:margin="0">cursor pos: x: {cursor.x}, y: {cursor.y}</p>
   <p style:margin="0">last action: {lastAction}</p>
   <p style:margin="0">scale: {scale.val}</p>
 
