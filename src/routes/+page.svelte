@@ -8,6 +8,7 @@
     /** @type {HTMLCanvasElement} */ canvas,
     /** @type {CanvasRenderingContext2D} */ context,
     /** @type {DOMRect} */ rect,
+    // canvas html tag width and height style, not attribute
     width = "80vw",
     height = "80vh",
     background = "#eee",
