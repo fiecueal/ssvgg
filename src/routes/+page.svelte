@@ -55,11 +55,8 @@
    * grid is drawn unless `grid.shown` is false
    */
   function draw() {
-    // make the canvas dimensions divisible by 3
-    let w = Math.trunc(rect.width);
-    let h = Math.trunc(rect.height);
-    canvas.width = w - (w % 3);
-    canvas.height = h - (h % 3);
+    canvas.width = rect.width
+    canvas.height = rect.height
     grid.x = Math.trunc(canvas.width / spacing.base);
     grid.y = Math.trunc(canvas.height / spacing.base);
 
