@@ -43,7 +43,7 @@
    */
   $: if (
     canvas &&
-    (innerWidth || innerHeight || width || height || grid || scale || mouse)
+    (innerWidth || innerHeight || width || height || grid || scale)
   ) {
     context = canvas.getContext("2d");
     rect = canvas.getBoundingClientRect();
@@ -66,7 +66,7 @@
 
   function drawGrid() {
     if (!grid.shown) return;
-    
+
     context.beginPath();
     for (let x = 1; x < grid.x / scale.val; x++) {
       for (let y = 1; y < grid.y / scale.val; y++) {
@@ -105,8 +105,15 @@
     mouse.x = Math.trunc(event.clientX - rect.left);
     mouse.y = Math.trunc(event.clientY - rect.top);
 
-    cursor.x = (offset.x - (offset.x % spacing.scaled)) / spacing.scaled;
-    cursor.y = (offset.y - (offset.y % spacing.scaled)) / spacing.scaled;
+    const x = (offset.x - (offset.x % spacing.scaled)) / spacing.scaled;
+    const y = (offset.y - (offset.y % spacing.scaled)) / spacing.scaled;
+
+    if (cursor.x !== x || cursor.y !== y) {
+      cursor.x = x;
+      cursor.y = y;
+      draw();
+      console.log("redraw on grid cursor move");
+    }
   }
 
   /**
