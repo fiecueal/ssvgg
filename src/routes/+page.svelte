@@ -62,6 +62,7 @@
     grid.y = Math.trunc(canvas.height / spacing.base);
 
     drawGrid();
+    drawPoints();
     drawCursor();
   }
 
@@ -79,6 +80,18 @@
       }
     }
     context.fillStyle = "darkgrey";
+    context.fill();
+    context.closePath();
+  }
+
+  function drawPoints() {
+    context.beginPath();
+    for (const point of points) {
+      const pos = { x: point.x * spacing.scaled, y: point.y * spacing.scaled };
+      context.moveTo(pos.x, pos.y);
+      context.arc(pos.x, pos.y, 4 * scale.val, 0, 2 * Math.PI, false);
+    }
+    context.fillStyle = "dimgrey";
     context.fill();
     context.closePath();
   }
@@ -122,18 +135,16 @@
    * secondary - select point to delete if on top of one
    */
   function mousedown(event) {
-    if (dev) {
-      switch (event.button) {
-        case 0:
-          lastAction = "primary down";
-          break;
-        case 1:
-          lastAction = "middle down";
-          break;
-        case 2:
-          lastAction = "secondary down";
-          break;
-      }
+    switch (event.button) {
+      case 0:
+        lastAction = "primary down";
+        break;
+      case 1:
+        lastAction = "middle down";
+        break;
+      case 2:
+        lastAction = "secondary down";
+        break;
     }
   }
 
@@ -143,18 +154,32 @@
    * secondary - delete point
    */
   function mouseup(event) {
-    if (dev) {
-      switch (event.button) {
-        case 0:
-          lastAction = "primary up";
-          break;
-        case 1:
-          lastAction = "middle up";
-          break;
-        case 2:
-          lastAction = "secondary up";
-          break;
-      }
+    switch (event.button) {
+      case 0:
+        points.push({ x: cursor.x, y: cursor.y });
+
+        // draws the latest point without refreshing everything
+        context.beginPath();
+        context.moveTo(cursor.x * spacing.scaled, cursor.y * spacing.scaled);
+        context.arc(
+          cursor.x * spacing.scaled,
+          cursor.y * spacing.scaled,
+          4 * scale.val,
+          0,
+          2 * Math.PI,
+          false,
+        );
+        context.fill();
+        context.closePath();
+
+        lastAction = "primary up";
+        break;
+      case 1:
+        lastAction = "middle up";
+        break;
+      case 2:
+        lastAction = "secondary up";
+        break;
     }
   }
 
