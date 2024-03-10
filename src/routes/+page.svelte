@@ -78,10 +78,13 @@
     }
     // end - draw grid markers
 
-    // draw cursor
+    drawCursor();
+  }
+
+  function drawCursor() {
     context.beginPath();
     context.lineWidth = scale.val;
-    // better aligns the drawn cursor to the mouse pointer
+    // offset aligns the grid cursor to the mouse pointer
     context.arc(
       offset.x - (offset.x % spacing.scaled),
       offset.y - (offset.y % spacing.scaled),
@@ -92,7 +95,6 @@
     );
     context.stroke();
     context.closePath();
-    // end - draw cursor
   }
 
   /**
