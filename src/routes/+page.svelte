@@ -113,7 +113,6 @@
       cursor.x = x;
       cursor.y = y;
       draw();
-      console.log("redraw on grid cursor move");
     }
   }
 
