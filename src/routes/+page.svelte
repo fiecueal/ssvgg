@@ -33,12 +33,6 @@
     viewBox = "",
     d = "";
 
-  $: spacing.scaled = spacing.base * scale.val;
-  $: offset = {
-    x: mouse.x + spacing.scaled / 2,
-    y: mouse.y + spacing.scaled / 2,
-  };
-
   /**
    * runs when canvas var is binded to <canvas>
    * or if anything messes with:
@@ -60,8 +54,9 @@
   function draw() {
     canvas.width = rect.width;
     canvas.height = rect.height;
-    grid.x = Math.trunc(canvas.width / spacing.base);
-    grid.y = Math.trunc(canvas.height / spacing.base);
+    spacing.scaled = spacing.base * scale.val;
+    grid.x = Math.trunc(canvas.width / spacing.scaled);
+    grid.y = Math.trunc(canvas.height / spacing.scaled);
 
     drawGrid();
     // drawRender()
@@ -73,8 +68,8 @@
     if (!grid.shown) return;
 
     context.beginPath();
-    for (let x = 1; x < grid.x / scale.val; x++) {
-      for (let y = 1; y < grid.y / scale.val; y++) {
+    for (let x = 1; x < grid.x; x++) {
+      for (let y = 1; y < grid.y; y++) {
         const thick_dot = x % 4 === 0 && y % 4 === 0;
         const pos = { x: x * spacing.scaled, y: y * spacing.scaled };
         const radius = thick_dot ? 2 : 1;
@@ -121,6 +116,10 @@
   function mousemove(event) {
     mouse.x = Math.trunc(event.clientX - rect.left);
     mouse.y = Math.trunc(event.clientY - rect.top);
+    offset = {
+      x: mouse.x + spacing.scaled / 2,
+      y: mouse.y + spacing.scaled / 2,
+    };
 
     const x = (offset.x - (offset.x % spacing.scaled)) / spacing.scaled;
     const y = (offset.y - (offset.y % spacing.scaled)) / spacing.scaled;
