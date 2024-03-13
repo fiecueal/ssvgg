@@ -1,5 +1,6 @@
 <script>
   import { dev } from "$app/environment";
+  import { keybinds } from "$lib/keybinds.js";
 
   let // bound to the window size
     innerWidth,
@@ -29,7 +30,8 @@
     // exported svg properties
     fill = "none",
     stroke = "#000",
-    viewBox = "";
+    viewBox = "",
+    d = "";
 
   $: spacing.scaled = spacing.base * scale.val;
   $: offset = {
@@ -62,6 +64,7 @@
     grid.y = Math.trunc(canvas.height / spacing.base);
 
     drawGrid();
+    // drawRender()
     drawPoints();
     drawCursor();
   }
@@ -200,10 +203,35 @@
    * runs other methods based on which key pressed
    * https://100r.co/site/dotgrid.html#shortcut_quick_list
    */
-  function keydown(event) {}
+  function keydown(event) {
+    if (event.repeat) return;
+    console.log(`${event.key} down`);
+
+    switch (event.key) {
+      case keybinds.line:
+        if (points.length < 2) break;
+        drawLines();
+        break;
+      case keybinds.fill:
+        console.log("fill");
+        break;
+    }
+  }
+
+  function drawLines() {
+    let new_d = `M${points[0].x},${points[0].y}`;
+
+    for (let i = 1; i < points.length; i++) {
+      new_d += `L${points[i].x},${points[i].y}`;
+    }
+
+    console.log("drew line: " + new_d);
+    points.length = 0;
+    d += new_d;
+  }
 </script>
 
-<svelte:window bind:innerHeight bind:innerWidth />
+<svelte:window bind:innerHeight bind:innerWidth on:keydown={keydown} />
 
 <!--
 width and height style (actual dimensions on client screen)
@@ -220,7 +248,6 @@ which is used to determine the number of grid markers to show on screen
   on:mousedown={mousedown}
   on:mouseup={mouseup}
   on:wheel|preventDefault={wheel}
-  on:keydown={keydown}
   on:contextmenu|preventDefault
 />
 
@@ -240,11 +267,12 @@ which is used to determine the number of grid markers to show on screen
 
   <svg
     {stroke}
+    {fill}
     {width}
     {height}
     viewBox="0 0 {grid.x} {grid.y}"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path d="M3,3L{grid.x - 3},{grid.y - 3}" />
+    <path {d} />
   </svg>
 {/if}

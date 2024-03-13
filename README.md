@@ -9,13 +9,13 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
     - [x] visibility toggle
   - [x] grid-snapped cursor
   - [ ] left click
-    - [ ] place a new point - **IN PROGRESS**
+    - [x] place a new point
     - [ ] drag to reposition point
     - [ ] ctrl+drag to copy a path
     - [ ] shift+drag to move a path
   - [ ] right click to delete point
   - [ ] strokes
-    - [ ] lines
+    - [x] lines
     - [ ] arc
     - [ ] arc rev
     - [ ] bezier
@@ -23,6 +23,7 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
     - [ ] arc rev(full)
     - [ ] clear selection
     - [ ] erase segment
+  - [ ] draw paths in canvas - **IN PROGRESS**
   - [ ] layers
   - [ ] style
     - [ ] close
