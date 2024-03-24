@@ -26,7 +26,7 @@
     },
     lastAction,
     points = [],
-    segments = [],
+    paths = { lines: [] },
     // exported svg properties
     fill = "none",
     stroke = "#000",
@@ -59,7 +59,7 @@
     grid.y = Math.trunc(canvas.height / spacing.scaled);
 
     drawGrid();
-    // drawRender()
+    drawRender();
     drawPoints();
     drawCursor();
   }
@@ -80,6 +80,24 @@
     context.fillStyle = "darkgrey";
     context.fill();
     context.closePath();
+  }
+
+  function drawRender() {
+    context.beginPath();
+    for (const point of paths.lines) {
+      console.log(point);
+      if (point.m) {
+        context.moveTo(point.x * spacing.scaled, point.y * spacing.scaled);
+      } else {
+        context.lineTo(point.x * spacing.scaled, point.y * spacing.scaled);
+      }
+    }
+    context.lineWidth = spacing.scaled;
+    context.fillStyle = fill;
+    context.strokeStyle = stroke;
+    context.stroke();
+    context.closePath();
+    // context.fill()
   }
 
   function drawPoints() {
@@ -204,7 +222,6 @@
    */
   function keydown(event) {
     if (event.repeat) return;
-    console.log(`${event.key} down`);
 
     switch (event.key) {
       case keybinds.line:
@@ -224,13 +241,18 @@
       new_d += `L${points[i].x},${points[i].y}`;
     }
 
-    console.log("drew line: " + new_d);
+    points[0].m = true;
+    paths.lines.push(...points);
     points.length = 0;
     d += new_d;
   }
 </script>
 
-<svelte:window bind:innerHeight bind:innerWidth on:keydown={keydown} />
+<svelte:window
+  bind:innerHeight
+  bind:innerWidth
+  on:keydown|preventDefault={keydown}
+/>
 
 <!--
 width and height style (actual dimensions on client screen)
@@ -259,6 +281,7 @@ which is used to determine the number of grid markers to show on screen
 </button>
 
 {#if dev}
+  <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
   <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
   <p style:margin="0">cursor pos: x: {cursor.x}, y: {cursor.y}</p>
   <p style:margin="0">last action: {lastAction}</p>
