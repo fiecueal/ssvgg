@@ -7,6 +7,10 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
 - [ ] feature parity with Dotgrid
   - [x] grid
     - [x] visibility toggle
+  - [ ] draw paths in canvas - **IN PROGRESS**
+    - [x] render on canvas
+    - [ ] render as SVG image instead of canvas commands
+    - [ ] render drag points
   - [x] grid-snapped cursor
   - [ ] left click
     - [x] place a new point
@@ -23,7 +27,6 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
     - [ ] arc rev(full)
     - [ ] clear selection
     - [ ] erase segment
-  - [ ] draw paths in canvas - **IN PROGRESS**
   - [ ] layers
   - [ ] style
     - [ ] close
@@ -44,6 +47,7 @@ Inspired by [Dotgrid](https://100r.co/site/dotgrid.html) and [GodSVG](https://gi
     - [x] zoomable grid(without zooming the browser window)
     - [ ] draggable grid when zoomed
     - [ ] zoom centered on current cursor position
+  - [ ] modifiable spacing between grid markers
   - [ ] resizable canvas(without resizing the browser window)
   - [ ] better handling of overlapping points
   - [ ] remove layer cap
