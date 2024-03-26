@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from "svelte";
   import { dev } from "$app/environment";
   import { keybinds } from "$lib/keybinds.js";
 
@@ -19,6 +20,7 @@
     spacing = { base: 15, scaled: 15 * scale.val },
     mouse = { x: 0, y: 0 },
     cursor = { x: 1, y: 1 },
+    click = { x: null, y: null, button: null },
     // offset to make mouse pointer accurate to the position of the grid cursor circle
     offset = {
       x: mouse.x + spacing.scaled / 2,
@@ -28,10 +30,16 @@
     points = [],
     paths = { lines: [] },
     // exported svg properties
+    svg,
     fill = "none",
     stroke = "#000",
     viewBox = "",
     d = "";
+
+  onMount(() => {
+    svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    context = canvas.getContext("2d");
+  });
 
   /**
    * runs when canvas var is binded to <canvas>
@@ -42,7 +50,6 @@
     canvas &&
     (innerWidth || innerHeight || width || height || grid || scale)
   ) {
-    context = canvas.getContext("2d");
     rect = canvas.getBoundingClientRect();
     draw();
   }
@@ -157,6 +164,10 @@
   function mousedown(event) {
     switch (event.button) {
       case 0:
+        click.button = 0;
+        click.x = cursor.x;
+        click.y = cursor.y;
+
         lastAction = "primary down";
         break;
       case 1:
@@ -189,6 +200,7 @@
           2 * Math.PI,
           false,
         );
+        context.fillStyle = "dimgrey";
         context.fill();
         context.closePath();
 
@@ -256,7 +268,7 @@
 
 <!--
 width and height style (actual dimensions on client screen)
-differ from canvas internal width and height(set in draw() function)
+differ from width and height attribute(set in draw() function)
 which is used to determine the number of grid markers to show on screen
 -->
 <canvas
