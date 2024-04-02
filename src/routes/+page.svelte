@@ -288,6 +288,14 @@ which is used to determine the number of grid markers to show on screen
 
 <button
   on:click={() => {
+    keydown({ key: "a", repeat: false });
+  }}
+>
+  draw line (A)
+</button>
+
+<button
+  on:click={() => {
     grid.shown = !grid.shown;
   }}
 >
