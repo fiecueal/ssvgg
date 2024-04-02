@@ -244,6 +244,8 @@
         console.log("fill");
         break;
     }
+
+    draw();
   }
 
   function drawLines() {
