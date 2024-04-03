@@ -2,7 +2,7 @@
 // changee eventually to more intuitive layout
 // (that can be done with one side of the
 // keyboard instead of all over the place)
-export let keybinds = {
+export const keybinds = {
   linecap: "q",
   linejoin: "w",
   mirror: "e",

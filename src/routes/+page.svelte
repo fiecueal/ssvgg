@@ -92,7 +92,6 @@
   function drawRender() {
     context.beginPath();
     for (const point of paths.lines) {
-      console.log(point);
       if (point.m) {
         context.moveTo(point.x * spacing.scaled, point.y * spacing.scaled);
       } else {
@@ -286,13 +285,15 @@ which is used to determine the number of grid markers to show on screen
   on:contextmenu|preventDefault
 />
 
-<button
-  on:click={() => {
-    keydown({ key: "a", repeat: false });
-  }}
->
-  draw line (A)
-</button>
+{#each Object.entries(keybinds) as [key, val]}
+  <button
+    on:click={() => {
+      keydown({ key: val });
+    }}
+  >
+    {key} ({val.toUpperCase()})
+  </button>
+{/each}
 
 <button
   on:click={() => {
