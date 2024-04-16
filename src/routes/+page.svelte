@@ -31,14 +31,29 @@
     paths = { lines: [] },
     // exported svg properties
     svg,
+    layers = [],
+    serializer,
+    serialized_svg,
     fill = "none",
     stroke = "#000",
-    viewBox = "",
     d = "";
 
   onMount(() => {
-    svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     context = canvas.getContext("2d");
+    serializer = new XMLSerializer();
+    // default layer 0 attribute
+    layers[0] = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    layers[0].setAttribute("fill", fill);
+    layers[0].setAttribute("stroke", stroke);
+    layers[0].setAttribute("d", "");
+    // default svg attribute
+    svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    svg.appendChild(layers[0]);
+    console.log(svg);
+    console.log(layers[0]);
   });
 
   /**
@@ -64,11 +79,14 @@
     spacing.scaled = spacing.base * scale.val;
     grid.x = Math.trunc(canvas.width / spacing.scaled);
     grid.y = Math.trunc(canvas.height / spacing.scaled);
+    svg.setAttribute("viewBox", `0 0 ${grid.x} ${grid.y}`);
 
     drawGrid();
     drawRender();
     drawPoints();
     drawCursor();
+
+    serialized_svg = serializer.serializeToString(svg);
   }
 
   function drawGrid() {
@@ -258,6 +276,8 @@
     paths.lines.push(...points);
     points.length = 0;
     d += new_d;
+    layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
+    console.log(serializer.serializeToString(svg));
   }
 </script>
 
@@ -310,14 +330,5 @@ which is used to determine the number of grid markers to show on screen
   <p style:margin="0">last action: {lastAction}</p>
   <p style:margin="0">scale: {scale.val}</p>
 
-  <svg
-    {stroke}
-    {fill}
-    {width}
-    {height}
-    viewBox="0 0 {grid.x} {grid.y}"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path {d} />
-  </svg>
+  {@html serialized_svg}
 {/if}
