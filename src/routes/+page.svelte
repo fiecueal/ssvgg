@@ -28,7 +28,7 @@
     },
     lastAction,
     points = [],
-    paths = { lines: [] },
+    paths = { lines: [], arcs: [] },
     // exported svg properties
     svg,
     layers = [],
@@ -234,6 +234,7 @@
   }
 
   /**
+   * also used when buttons are clicked
    * runs other methods based on which key pressed
    * https://100r.co/site/dotgrid.html#shortcut_quick_list
    */
@@ -243,21 +244,22 @@
     switch (event.key) {
       case keybinds.line:
         if (points.length < 2) break;
-        drawLines();
+        setLines();
         break;
-      case keybinds.fill:
-        console.log("fill");
+      case keybinds.arc:
+        if (points.length < 2) break;
+        setArcs();
         break;
     }
 
     draw();
   }
 
-  function drawLines() {
-    let new_d = `M${points[0].x},${points[0].y}`;
+  function setLines() {
+    let new_d = `M${points[0].x} ${points[0].y}`;
 
     for (let i = 1; i < points.length; i++) {
-      new_d += `L${points[i].x},${points[i].y}`;
+      new_d += `L${points[i].x} ${points[i].y}`;
     }
 
     points[0].m = true;
@@ -265,7 +267,24 @@
     points.length = 0;
     d += new_d;
     layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
-    console.log(serializer.serializeToString(svg));
+  }
+
+  function setArcs() {
+    let new_d = `M${points[0].x} ${points[0].y}`;
+    let prev = points[0];
+
+    for (let i = 1; i < points.length; i++) {
+      new_d += `A${Math.abs(points[i].x - prev.x)} ${Math.abs(
+        points[i].y - prev.y,
+      )} 0 0 1 ${points[i].x} ${points[i].y}`;
+      prev = points[i]
+    }
+
+    points[0].m = true;
+    paths.arcs.push(...points);
+    points.length = 0;
+    d += new_d;
+    layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
   }
 </script>
 
