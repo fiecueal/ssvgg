@@ -49,8 +49,6 @@
     // default svg attribute
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
     svg.appendChild(layers[0]);
     console.log(svg);
     console.log(layers[0]);
@@ -66,6 +64,7 @@
     (innerWidth || innerHeight || width || height || grid || scale)
   ) {
     rect = canvas.getBoundingClientRect();
+    serialized_svg = serializer.serializeToString(svg);
     draw();
   }
 
@@ -85,8 +84,6 @@
     drawRender();
     drawPoints();
     drawCursor();
-
-    serialized_svg = serializer.serializeToString(svg);
   }
 
   function drawGrid() {
@@ -108,20 +105,11 @@
   }
 
   function drawRender() {
-    context.beginPath();
-    for (const point of paths.lines) {
-      if (point.m) {
-        context.moveTo(point.x * spacing.scaled, point.y * spacing.scaled);
-      } else {
-        context.lineTo(point.x * spacing.scaled, point.y * spacing.scaled);
-      }
-    }
-    context.lineWidth = spacing.scaled;
-    context.fillStyle = fill;
-    context.strokeStyle = stroke;
-    context.stroke();
-    context.closePath();
-    // context.fill()
+    let img = new Image()
+    img.onload = function () {
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(serialized_svg)
   }
 
   function drawPoints() {
