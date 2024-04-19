@@ -35,8 +35,7 @@
     serializer,
     serialized_svg,
     fill = "none",
-    stroke = "#000",
-    d = "";
+    stroke = "#000";
 
   onMount(() => {
     context = canvas.getContext("2d");
@@ -265,7 +264,6 @@
     points[0].m = true;
     paths.lines.push(...points);
     points.length = 0;
-    d += new_d;
     layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
   }
 
@@ -283,7 +281,6 @@
     points[0].m = true;
     paths.arcs.push(...points);
     points.length = 0;
-    d += new_d;
     layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
   }
 </script>
