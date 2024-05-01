@@ -27,11 +27,11 @@
       y: mouse.y + spacing.scaled / 2,
     },
     lastAction,
-    points = [],
-    paths = { lines: [], arcs: [] },
+    preview_points = [],
     // exported svg properties
     svg,
-    layers = [],
+    layers = [{ path: null, points: [] }],
+    current_layer = 0,
     serializer,
     serialized_svg,
     fill = "none",
@@ -40,17 +40,20 @@
   onMount(() => {
     context = canvas.getContext("2d");
     serializer = new XMLSerializer();
-    // default layer 0 attribute
-    layers[0] = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    layers[0].setAttribute("fill", fill);
-    layers[0].setAttribute("stroke", stroke);
-    layers[0].setAttribute("d", "");
-    // default svg attribute
+    // initialize first path for the svg
+    layers[current_layer].path = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path",
+    );
+    layers[current_layer].path.setAttribute("fill", fill);
+    layers[current_layer].path.setAttribute("stroke", stroke);
+    layers[current_layer].path.setAttribute("d", "");
+    // initialize svg
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    svg.appendChild(layers[0]);
+    svg.appendChild(layers[current_layer].path);
     console.log(svg);
-    console.log(layers[0]);
+    console.log(layers[current_layer]);
   });
 
   /**
@@ -64,6 +67,7 @@
   ) {
     rect = canvas.getBoundingClientRect();
     serialized_svg = serializer.serializeToString(svg);
+    // context.clearRect(0, 0, canvas.width, canvas.height);
     draw();
   }
 
@@ -81,7 +85,8 @@
 
     drawGrid();
     drawRender();
-    drawPoints();
+    drawPreviewPoints();
+    // drawPlacedPoints()
     drawCursor();
   }
 
@@ -104,16 +109,16 @@
   }
 
   function drawRender() {
-    let img = new Image()
+    let img = new Image();
     img.onload = function () {
       context.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
-    img.src = 'data:image/svg+xml;base64,' + btoa(serialized_svg)
+    img.src = "data:image/svg+xml;base64," + btoa(serialized_svg);
   }
 
-  function drawPoints() {
+  function drawPreviewPoints() {
     context.beginPath();
-    for (const point of points) {
+    for (const point of preview_points) {
       const pos = { x: point.x * spacing.scaled, y: point.y * spacing.scaled };
       context.moveTo(pos.x, pos.y);
       context.arc(pos.x, pos.y, 4 * scale.val, 0, 2 * Math.PI, false);
@@ -122,6 +127,8 @@
     context.fill();
     context.closePath();
   }
+
+  // TODO function drawPlacedPoints() {}
 
   function drawCursor() {
     context.beginPath();
@@ -191,7 +198,7 @@
   function mouseup(event) {
     switch (event.button) {
       case 0:
-        points.push({ x: cursor.x, y: cursor.y });
+        preview_points.push({ x: cursor.x, y: cursor.y });
 
         // draws the latest point without refreshing everything
         context.beginPath();
@@ -242,11 +249,11 @@
 
     switch (event.key) {
       case keybinds.line:
-        if (points.length < 2) break;
+        if (preview_points.length < 2) break;
         setLines();
         break;
       case keybinds.arc:
-        if (points.length < 2) break;
+        if (preview_points.length < 2) break;
         setArcs();
         break;
     }
@@ -255,33 +262,39 @@
   }
 
   function setLines() {
-    let new_d = `M${points[0].x} ${points[0].y}`;
+    let new_d = `M${preview_points[0].x} ${preview_points[0].y}`;
 
-    for (let i = 1; i < points.length; i++) {
-      new_d += `L${points[i].x} ${points[i].y}`;
+    for (let i = 1; i < preview_points.length; i++) {
+      preview_points[i].type = "L";
+      new_d += `L${preview_points[i].x} ${preview_points[i].y}`;
     }
 
-    points[0].m = true;
-    paths.lines.push(...points);
-    points.length = 0;
-    layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
+    preview_points[0].type = "M";
+    layers[current_layer].points.push(...preview_points);
+    preview_points.length = 0;
+    layers[current_layer].path.setAttribute(
+      "d",
+      layers[current_layer].path.getAttribute("d") + new_d,
+    );
   }
 
   function setArcs() {
-    let new_d = `M${points[0].x} ${points[0].y}`;
-    let prev = points[0];
+    let new_d = `M${preview_points[0].x} ${preview_points[0].y}`;
 
-    for (let i = 1; i < points.length; i++) {
-      new_d += `A${Math.abs(points[i].x - prev.x)} ${Math.abs(
-        points[i].y - prev.y,
-      )} 0 0 1 ${points[i].x} ${points[i].y}`;
-      prev = points[i]
+    for (let i = 1; i < preview_points.length; i++) {
+      preview_points[i].type = "A";
+      new_d += `A${Math.abs(preview_points[i].x - preview_points[i-1].x)} ${Math.abs(
+        preview_points[i].y - preview_points[i-1].y,
+      )} 0 0 1 ${preview_points[i].x} ${preview_points[i].y}`;
     }
 
-    points[0].m = true;
-    paths.arcs.push(...points);
-    points.length = 0;
-    layers[0].setAttribute("d", layers[0].getAttribute("d") + new_d);
+    preview_points[0].type = "M";
+    layers[current_layer].points.push(...preview_points);
+    preview_points.length = 0;
+    layers[current_layer].path.setAttribute(
+      "d",
+      layers[current_layer].path.getAttribute("d") + new_d,
+    );
   }
 </script>
 
