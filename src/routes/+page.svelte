@@ -111,7 +111,8 @@
   function drawRender() {
     let img = new Image();
     img.onload = function () {
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      context.drawImage(img, 0, 0, grid.x * spacing.scaled, grid.y * spacing.scaled);
+      // context.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
     img.src = "data:image/svg+xml;base64," + btoa(serialized_svg);
   }
