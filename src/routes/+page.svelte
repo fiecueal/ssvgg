@@ -141,8 +141,8 @@
     context.lineWidth = scale.val;
     // offset aligns the grid cursor to the mouse pointer
     context.arc(
-      offset.x - (offset.x % spacing.scaled),
-      offset.y - (offset.y % spacing.scaled),
+      offset.x - (offset.x % spacing.scaled) + 0.5,
+      offset.y - (offset.y % spacing.scaled) + 0.5,
       spacing.scaled / 2,
       0,
       2 * Math.PI,
