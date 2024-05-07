@@ -32,14 +32,13 @@
     svg,
     layers = [{ path: null, points: [] }],
     current_layer = 0,
-    serializer,
     serialized_svg,
+    rendered_svg,
     fill = "none",
     stroke = "#000";
 
   onMount(() => {
     context = canvas.getContext("2d");
-    serializer = new XMLSerializer();
     // initialize first path for the svg
     layers[current_layer].path = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -64,7 +63,6 @@
     (innerWidth || innerHeight || width || height || grid || scale)
   ) {
     rect = canvas.getBoundingClientRect();
-    serialized_svg = serializer.serializeToString(svg);
     context.clearRect(0, 0, canvas.width, canvas.height);
     draw();
   }
@@ -107,17 +105,34 @@
   }
 
   function drawRender() {
-    let img = new Image();
-    img.onload = function () {
+    if (!rendered_svg) {
+      serialized_svg = new XMLSerializer().serializeToString(svg);
+      let url = URL.createObjectURL(
+        new Blob([serialized_svg], {
+          type: "image/svg+xml;charset=utf-8",
+        }),
+      );
+      rendered_svg = new Image();
+      rendered_svg.onload = function () {
+        context.drawImage(
+          rendered_svg,
+          0,
+          0,
+          grid.x * spacing.scaled,
+          grid.y * spacing.scaled,
+        );
+        URL.revokeObjectURL(url);
+      };
+      rendered_svg.src = url;
+    } else {
       context.drawImage(
-        img,
+        rendered_svg,
         0,
         0,
         grid.x * spacing.scaled,
         grid.y * spacing.scaled,
       );
-    };
-    img.src = "data:image/svg+xml;base64," + btoa(serialized_svg);
+    }
   }
 
   function drawPreviewPoints() {
@@ -193,7 +208,6 @@
   function mousedown(event) {
     switch (event.button) {
       case 0:
-        click.button = 0;
         click.x = cursor.x;
         click.y = cursor.y;
 
@@ -314,7 +328,6 @@
     }
 
     setPath();
-
     draw();
   }
 
@@ -374,6 +387,7 @@
       }
     }
     layers[current_layer].path.setAttribute("d", new_d);
+    rendered_svg = null;
   }
 </script>
 
