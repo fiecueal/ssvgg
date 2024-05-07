@@ -20,7 +20,7 @@
     spacing = { base: 15, scaled: 15 * scale.val },
     mouse = { x: 0, y: 0 },
     cursor = { x: 1, y: 1 },
-    click = { x: null, y: null, button: null },
+    click = { x: null, y: null, button: null, held: null },
     // offset to make mouse pointer accurate to the position of the grid cursor circle
     offset = {
       x: mouse.x + spacing.scaled / 2,
@@ -52,8 +52,6 @@
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     svg.appendChild(layers[current_layer].path);
-    console.log(svg);
-    console.log(layers[current_layer]);
   });
 
   /**
@@ -86,7 +84,7 @@
     drawGrid();
     drawRender();
     drawPreviewPoints();
-    // drawPlacedPoints()
+    drawPlacedPoints();
     drawCursor();
   }
 
@@ -134,7 +132,21 @@
     context.closePath();
   }
 
-  // TODO function drawPlacedPoints() {}
+  function drawPlacedPoints() {
+    for (const point of layers[current_layer].points) {
+      const pos = { x: point.x * spacing.scaled, y: point.y * spacing.scaled };
+      context.beginPath();
+      context.arc(pos.x, pos.y, 6 * scale.val, 0, 2 * Math.PI, false);
+      context.fillStyle = "black";
+      context.fill();
+      context.closePath();
+      context.beginPath();
+      context.arc(pos.x, pos.y, 2 * scale.val, 0, 2 * Math.PI, false);
+      context.fillStyle = "white";
+      context.fill();
+      context.closePath();
+    }
+  }
 
   function drawCursor() {
     context.beginPath();
@@ -185,6 +197,12 @@
         click.x = cursor.x;
         click.y = cursor.y;
 
+        for (const point of layers[current_layer].points) {
+          if (point.x === cursor.x && point.y === cursor.y) {
+            click.held = point;
+          }
+        }
+
         lastAction = "primary down";
         break;
       case 1:
@@ -204,23 +222,33 @@
   function mouseup(event) {
     switch (event.button) {
       case 0:
-        preview_points.push({ x: cursor.x, y: cursor.y });
+        if (
+          click.held === null ||
+          (click.held.x === cursor.x && click.held.y === cursor.y)
+        ) {
+          preview_points.push({ x: cursor.x, y: cursor.y });
 
-        // draws the latest point without refreshing everything
-        context.beginPath();
-        context.moveTo(cursor.x * spacing.scaled, cursor.y * spacing.scaled);
-        context.arc(
-          cursor.x * spacing.scaled,
-          cursor.y * spacing.scaled,
-          4 * scale.val,
-          0,
-          2 * Math.PI,
-          false,
-        );
-        context.fillStyle = "dimgrey";
-        context.fill();
-        context.closePath();
-
+          // draws the latest point without refreshing everything
+          context.beginPath();
+          context.moveTo(cursor.x * spacing.scaled, cursor.y * spacing.scaled);
+          context.arc(
+            cursor.x * spacing.scaled,
+            cursor.y * spacing.scaled,
+            4 * scale.val,
+            0,
+            2 * Math.PI,
+            false,
+          );
+          context.fillStyle = "dimgrey";
+          context.fill();
+          context.closePath();
+        } else {
+          click.held.x = cursor.x;
+          click.held.y = cursor.y;
+          setPath();
+          draw();
+        }
+        click.held = null;
         lastAction = "primary up";
         break;
       case 1:
@@ -256,82 +284,88 @@
     switch (event.key) {
       case keybinds.line:
         if (preview_points.length < 2) break;
-        setPath("L");
+        setPathType("L");
         break;
       case keybinds.arc:
         if (preview_points.length < 2) break;
-        setPath("A");
+        setPathType("A1");
         break;
       case keybinds.arc_rev:
         if (preview_points.length < 2) break;
-        setPath("Arev");
+        setPathType("A0");
         break;
       case keybinds.bezier_quad:
         if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
-        setPath("Q");
+        setPathType("Q");
         break;
       case keybinds.bezier_cube:
         if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
           break;
-        setPath("C");
+        setPathType("C");
         break;
     }
+
+    setPath();
 
     draw();
   }
 
-  function setPath(type) {
-    let new_d = `M${preview_points[0].x} ${preview_points[0].y}`;
+  function setPathType(type) {
     preview_points[0].type = "M";
 
     switch (type) {
       case "L":
+      case "A1":
+      case "A0":
         for (let i = 1; i < preview_points.length; i++) {
-          preview_points[i].type = "L";
-          new_d += `L${preview_points[i].x} ${preview_points[i].y}`;
-        }
-        break;
-      case "A":
-      case "Arev":
-        const rotation = type === "A" ? 1 : 0;
-        for (let i = 1; i < preview_points.length; i++) {
-          preview_points[i].type = "A";
-          new_d += `A${Math.abs(
-            preview_points[i].x - preview_points[i - 1].x,
-          )} ${Math.abs(preview_points[i].y - preview_points[i - 1].y)} 0 0 ${rotation} ${
-            preview_points[i].x
-          } ${preview_points[i].y}`;
+          preview_points[i].type = type;
         }
         break;
       case "Q":
-        let control_point = true;
         for (let i = 1; i < preview_points.length; i++) {
-          preview_points[i].type = "Q";
-          if (control_point) {
-            new_d += `Q${preview_points[i].x} ${preview_points[i].y}`;
-          } else {
-            new_d += ` ${preview_points[i].x} ${preview_points[i].y}`;
-          }
-
-          control_point = !control_point;
+          preview_points[i].type = "Q" + (i % 2);
         }
         break;
       case "C":
         for (let i = 1; i < preview_points.length; i++) {
-          if ((i - 1) % 3 === 0) {
-            new_d += `C${preview_points[i].x} ${preview_points[i].y}`;
-          } else {
-            new_d += ` ${preview_points[i].x} ${preview_points[i].y}`;
-          }
+          preview_points[i].type = "C" + (i % 3);
         }
+        break;
     }
 
     layers[current_layer].points.push(...preview_points);
     preview_points.length = 0;
-    layers[current_layer].path.setAttribute(
-      "d",
-      layers[current_layer].path.getAttribute("d") + new_d,
-    );
+  }
+
+  function setPath() {
+    let new_d = "";
+    for (let i = 0; i < layers[current_layer].points.length; i++) {
+      const point = layers[current_layer].points[i];
+      switch (point.type) {
+        case "M":
+        case "L":
+          new_d += `${point.type}${point.x} ${point.y}`;
+          break;
+        case "A1":
+        case "A0":
+          new_d += `A${Math.abs(
+            point.x - layers[current_layer].points[i - 1].x,
+          )} ${Math.abs(
+            point.y - layers[current_layer].points[i - 1].y,
+          )} 0 0 ${point.type.charAt(1)} ${point.x} ${point.y}`;
+          break;
+        case "Q0":
+        case "Q1":
+        case "C0":
+        case "C1":
+        case "C2":
+          new_d += `${
+            Number(point.type.charAt(1)) === 1 ? point.type.charAt(0) : " "
+          }${point.x} ${point.y}`;
+          break;
+      }
+    }
+    layers[current_layer].path.setAttribute("d", new_d);
   }
 </script>
 
