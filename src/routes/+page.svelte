@@ -111,8 +111,13 @@
   function drawRender() {
     let img = new Image();
     img.onload = function () {
-      context.drawImage(img, 0, 0, grid.x * spacing.scaled, grid.y * spacing.scaled);
-      // context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      context.drawImage(
+        img,
+        0,
+        0,
+        grid.x * spacing.scaled,
+        grid.y * spacing.scaled,
+      );
     };
     img.src = "data:image/svg+xml;base64," + btoa(serialized_svg);
   }
@@ -257,6 +262,19 @@
         if (preview_points.length < 2) break;
         setPath("A");
         break;
+      case keybinds.arc_rev:
+        if (preview_points.length < 2) break;
+        setPath("Arev");
+        break;
+      case keybinds.bezier_quad:
+        if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
+        setPath("Q");
+        break;
+      case keybinds.bezier_cube:
+        if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
+          break;
+        setPath("C");
+        break;
     }
 
     draw();
@@ -274,15 +292,38 @@
         }
         break;
       case "A":
+      case "Arev":
+        const rotation = type === "A" ? 1 : 0;
         for (let i = 1; i < preview_points.length; i++) {
           preview_points[i].type = "A";
           new_d += `A${Math.abs(
             preview_points[i].x - preview_points[i - 1].x,
-          )} ${Math.abs(preview_points[i].y - preview_points[i - 1].y)} 0 0 1 ${
+          )} ${Math.abs(preview_points[i].y - preview_points[i - 1].y)} 0 0 ${rotation} ${
             preview_points[i].x
           } ${preview_points[i].y}`;
         }
         break;
+      case "Q":
+        let control_point = true;
+        for (let i = 1; i < preview_points.length; i++) {
+          preview_points[i].type = "Q";
+          if (control_point) {
+            new_d += `Q${preview_points[i].x} ${preview_points[i].y}`;
+          } else {
+            new_d += ` ${preview_points[i].x} ${preview_points[i].y}`;
+          }
+
+          control_point = !control_point;
+        }
+        break;
+      case "C":
+        for (let i = 1; i < preview_points.length; i++) {
+          if ((i - 1) % 3 === 0) {
+            new_d += `C${preview_points[i].x} ${preview_points[i].y}`;
+          } else {
+            new_d += ` ${preview_points[i].x} ${preview_points[i].y}`;
+          }
+        }
     }
 
     layers[current_layer].points.push(...preview_points);
