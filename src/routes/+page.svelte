@@ -67,7 +67,7 @@
   ) {
     rect = canvas.getBoundingClientRect();
     serialized_svg = serializer.serializeToString(svg);
-    // context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
     draw();
   }
 
@@ -251,45 +251,40 @@
     switch (event.key) {
       case keybinds.line:
         if (preview_points.length < 2) break;
-        setLines();
+        setPath("L");
         break;
       case keybinds.arc:
         if (preview_points.length < 2) break;
-        setArcs();
+        setPath("A");
         break;
     }
 
     draw();
   }
 
-  function setLines() {
+  function setPath(type) {
     let new_d = `M${preview_points[0].x} ${preview_points[0].y}`;
+    preview_points[0].type = "M";
 
-    for (let i = 1; i < preview_points.length; i++) {
-      preview_points[i].type = "L";
-      new_d += `L${preview_points[i].x} ${preview_points[i].y}`;
+    switch (type) {
+      case "L":
+        for (let i = 1; i < preview_points.length; i++) {
+          preview_points[i].type = "L";
+          new_d += `L${preview_points[i].x} ${preview_points[i].y}`;
+        }
+        break;
+      case "A":
+        for (let i = 1; i < preview_points.length; i++) {
+          preview_points[i].type = "A";
+          new_d += `A${Math.abs(
+            preview_points[i].x - preview_points[i - 1].x,
+          )} ${Math.abs(preview_points[i].y - preview_points[i - 1].y)} 0 0 1 ${
+            preview_points[i].x
+          } ${preview_points[i].y}`;
+        }
+        break;
     }
 
-    preview_points[0].type = "M";
-    layers[current_layer].points.push(...preview_points);
-    preview_points.length = 0;
-    layers[current_layer].path.setAttribute(
-      "d",
-      layers[current_layer].path.getAttribute("d") + new_d,
-    );
-  }
-
-  function setArcs() {
-    let new_d = `M${preview_points[0].x} ${preview_points[0].y}`;
-
-    for (let i = 1; i < preview_points.length; i++) {
-      preview_points[i].type = "A";
-      new_d += `A${Math.abs(preview_points[i].x - preview_points[i-1].x)} ${Math.abs(
-        preview_points[i].y - preview_points[i-1].y,
-      )} 0 0 1 ${preview_points[i].x} ${preview_points[i].y}`;
-    }
-
-    preview_points[0].type = "M";
     layers[current_layer].points.push(...preview_points);
     preview_points.length = 0;
     layers[current_layer].path.setAttribute(
