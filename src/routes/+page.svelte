@@ -226,27 +226,9 @@
           click.held === null ||
           (click.held.x === cursor.x && click.held.y === cursor.y)
         ) {
-          preview_points.push({ x: cursor.x, y: cursor.y });
-
-          // draws the latest point without refreshing everything
-          context.beginPath();
-          context.moveTo(cursor.x * spacing.scaled, cursor.y * spacing.scaled);
-          context.arc(
-            cursor.x * spacing.scaled,
-            cursor.y * spacing.scaled,
-            4 * scale.val,
-            0,
-            2 * Math.PI,
-            false,
-          );
-          context.fillStyle = "dimgrey";
-          context.fill();
-          context.closePath();
+          addPreviewPoint();
         } else {
-          click.held.x = cursor.x;
-          click.held.y = cursor.y;
-          setPath();
-          draw();
+          moveHeldPoint();
         }
         click.held = null;
         lastAction = "primary up";
@@ -258,6 +240,32 @@
         lastAction = "secondary up";
         break;
     }
+  }
+
+  function addPreviewPoint() {
+    preview_points.push({ x: cursor.x, y: cursor.y });
+
+    // draws the latest point without refreshing everything
+    context.beginPath();
+    context.moveTo(cursor.x * spacing.scaled, cursor.y * spacing.scaled);
+    context.arc(
+      cursor.x * spacing.scaled,
+      cursor.y * spacing.scaled,
+      4 * scale.val,
+      0,
+      2 * Math.PI,
+      false,
+    );
+    context.fillStyle = "dimgrey";
+    context.fill();
+    context.closePath();
+  }
+
+  function moveHeldPoint() {
+    click.held.x = cursor.x;
+    click.held.y = cursor.y;
+    setPath();
+    draw();
   }
 
   /**
