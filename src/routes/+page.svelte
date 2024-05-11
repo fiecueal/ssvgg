@@ -11,8 +11,6 @@
     /** @type {CanvasRenderingContext2D} */ context,
     /** @type {DOMRect} */ rect,
     // canvas html tag width and height style, not attribute
-    width = "80vw",
-    height = "80vh",
     background = "#eee",
     // settings & state
     grid = { x: 0, y: 0, shown: true },
@@ -58,10 +56,7 @@
    * or if anything messes with:
    * window size, canvas size, grid marker count/visibility/scale
    */
-  $: if (
-    canvas &&
-    (innerWidth || innerHeight || width || height || grid || scale)
-  ) {
+  $: if (canvas && (innerWidth || innerHeight || grid || scale)) {
     rect = canvas.getBoundingClientRect();
     context.clearRect(0, 0, canvas.width, canvas.height);
     draw();
@@ -405,9 +400,7 @@ differ from width and height attribute(set in draw() function)
 which is used to determine the number of grid markers to show on screen
 -->
 <canvas
-  style="display: block; margin: auto"
-  style:width
-  style:height
+  style="display:block;width:70vw;height:70vh"
   style:background
   bind:this={canvas}
   on:mousemove={mousemove}
