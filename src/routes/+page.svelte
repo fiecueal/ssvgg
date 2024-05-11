@@ -293,6 +293,8 @@
     } else if (event.deltaY > 0 && scale.val > scale.min) {
       scale.val = Math.trunc(scale.val * 10 - 1) / 10;
     }
+
+    rendered_svg = null;
   }
 
   /**
