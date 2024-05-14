@@ -1,3 +1,10 @@
+export const options = {
+  linecap: "q",
+  linejoin: "w",
+  close: "e",
+  fill: "r",
+}
+
 export const paths = {
   line: "a",
   arc: "s",
@@ -7,15 +14,12 @@ export const paths = {
 }
 
 export const shapes = {
-  rect: "q",
-  ellipse: "w",
+  rect: "z",
+  ellipse: "x",
 }
 
-// linecap: "q",
-// linejoin: "w",
-// mirror: "e",
-// fill: "r",
-// close: "z",
-// remove_point: "x",
-// c: "", // not assigned in dotgrid
-// v: "", // not assigned in dotgrid
+export const downloads = {
+  png: "c",
+  jpg: "v",
+  svg: "b",
+}

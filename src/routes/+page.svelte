@@ -324,6 +324,15 @@
           break;
         setPathType("C");
         break;
+      // case keybinds.downloads.png:
+      //   downloadImage("png");
+      //   break;
+      // case keybinds.downloads.jpg:
+      //   downloadImage("jpg");
+      //   break;
+      case keybinds.downloads.svg:
+        downloadSVG();
+        break;
     }
 
     setPath();
@@ -387,6 +396,25 @@
     }
     layers[current_layer].path.setAttribute("d", new_d);
     rendered_svg = null;
+  }
+
+  function downloadSVG() {
+    const d = new Date();
+    let timestamp = `${d.getFullYear()}`;
+    timestamp += `-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    timestamp += `-${String(d.getDate()).padStart(2, "0")}`;
+    timestamp += `_${String(d.getHours()).padStart(2, "0")}`;
+    timestamp += `-${String(d.getMinutes()).padStart(2, "0")}`;
+    timestamp += `-${String(d.getSeconds()).padStart(2, "0")}`;
+
+    const url = URL.createObjectURL(
+      new Blob([serialized_svg], { type: "image+svg/xml;charset=utf-8" }),
+    );
+
+    const link = document.createElement("a");
+    link.setAttribute("download", `ssvgg_${timestamp}.svg`);
+    link.setAttribute("href", url);
+    link.click();
   }
 </script>
 
