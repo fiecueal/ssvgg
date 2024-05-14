@@ -19,6 +19,7 @@
     mouse = { x: 0, y: 0 },
     cursor = { x: 1, y: 1 },
     click = { x: null, y: null, button: null, held: null },
+    // TODO: the setup with offset var sucks, change later
     // offset to make mouse pointer accurate to the position of the grid cursor circle
     offset = {
       x: mouse.x + spacing.scaled / 2,
@@ -399,41 +400,62 @@ width and height style (actual dimensions on client screen)
 differ from width and height attribute(set in draw() function)
 which is used to determine the number of grid markers to show on screen
 -->
-<canvas
-  style="display:block;width:70vw;height:70vh"
-  style:background
-  bind:this={canvas}
-  on:mousemove={mousemove}
-  on:mousedown={mousedown}
-  on:mouseup={mouseup}
-  on:wheel|preventDefault={wheel}
-  on:contextmenu|preventDefault
-/>
+<div id="container">
+  <div style="grid-area:layers" style:background>add stuff here later</div>
 
-{#each Object.entries(keybinds) as [key, val]}
-  <button
-    on:click={() => {
-      keydown({ key: val });
-    }}
-  >
-    {key} ({val.toUpperCase()})
-  </button>
-{/each}
+  <canvas
+    style="grid-area:canvas;width:100%;height:100%"
+    style:background
+    bind:this={canvas}
+    on:mousemove={mousemove}
+    on:mousedown={mousedown}
+    on:mouseup={mouseup}
+    on:wheel|preventDefault={wheel}
+    on:contextmenu|preventDefault
+  />
 
-<button
-  on:click={() => {
-    grid.shown = !grid.shown;
-  }}
->
-  show grid: {grid.shown}
-</button>
+  <div style="grid-area:options" style:background>
+    {#each Object.entries(keybinds.paths) as [key, val]}
+      <button
+        on:click={() => {
+          // runs the same function as a keydown event so uses the same method
+          keydown({ key: val });
+        }}
+      >
+        {key} ({val.toUpperCase()})
+      </button>
+    {/each}
+    <button
+      on:click={() => {
+        grid.shown = !grid.shown;
+      }}
+    >
+      show grid: {grid.shown}
+    </button>
 
-{#if dev}
-  <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
-  <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
-  <p style:margin="0">cursor pos: x: {cursor.x}, y: {cursor.y}</p>
-  <p style:margin="0">last action: {lastAction}</p>
-  <p style:margin="0">scale: {scale.val}</p>
+    {#if dev}
+      <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
+      <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
+      <p style:margin="0">cursor pos: x: {cursor.x}, y: {cursor.y}</p>
+      <p style:margin="0">last action: {lastAction}</p>
+      <p style:margin="0">scale: {scale.val}</p>
 
-  {@html serialized_svg}
-{/if}
+      {@html serialized_svg}
+    {/if}
+  </div>
+</div>
+
+<style>
+  #container {
+    width: calc(100vw - 1rem);
+    height: calc(100vh - 1rem);
+    margin: 0.5rem;
+    gap: 0.5rem;
+    display: grid;
+    grid-template-areas:
+      "layers canvas"
+      "options options";
+    grid-template-columns: 15rem 1fr;
+    grid-template-rows: 1fr 25rem;
+  }
+</style>
