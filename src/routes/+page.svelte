@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { dev } from "$app/environment";
-  import { keybinds } from "$lib/keybinds.js";
+  import * as keybinds from "$lib/keybinds.js";
 
   let // bound to the window size
     innerWidth,
@@ -33,6 +33,7 @@
     current_layer = 0,
     serialized_svg,
     rendered_svg,
+    // default layer properties
     fill = "none",
     stroke = "#000";
 
@@ -302,23 +303,23 @@
     if (event.repeat) return;
 
     switch (event.key) {
-      case keybinds.line:
+      case keybinds.paths.line:
         if (preview_points.length < 2) break;
         setPathType("L");
         break;
-      case keybinds.arc:
+      case keybinds.paths.arc:
         if (preview_points.length < 2) break;
         setPathType("A1");
         break;
-      case keybinds.arc_rev:
+      case keybinds.paths.arc_rev:
         if (preview_points.length < 2) break;
         setPathType("A0");
         break;
-      case keybinds.bezier_quad:
+      case keybinds.paths.bezier_quad:
         if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
         setPathType("Q");
         break;
-      case keybinds.bezier_cube:
+      case keybinds.paths.bezier_cube:
         if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
           break;
         setPathType("C");
