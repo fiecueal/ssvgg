@@ -10,7 +10,6 @@
     /** @type {HTMLCanvasElement} */ canvas,
     /** @type {CanvasRenderingContext2D} */ context,
     /** @type {DOMRect} */ rect,
-    // canvas html tag width and height style, not attribute
     background = "#eee",
     // settings & state
     grid = { x: 0, y: 0, shown: true },
@@ -28,11 +27,14 @@
     lastAction,
     preview_points = [],
     // exported svg properties
+    // svg html element
     svg,
+    // svg as a string
+    serialized_svg,
+    // svg as a URL to an image
+    rendered_svg,
     layers = [{ path: null, points: [] }],
     current_layer = 0,
-    serialized_svg,
-    rendered_svg,
     // default layer properties
     fill = "none",
     stroke = "#000";
@@ -104,7 +106,7 @@
   function drawRender() {
     if (!rendered_svg) {
       serialized_svg = new XMLSerializer().serializeToString(svg);
-      let url = URL.createObjectURL(
+      const url = URL.createObjectURL(
         new Blob([serialized_svg], {
           type: "image/svg+xml;charset=utf-8",
         }),
@@ -324,14 +326,11 @@
           break;
         setPathType("C");
         break;
-      // case keybinds.downloads.png:
-      //   downloadImage("png");
-      //   break;
-      // case keybinds.downloads.jpg:
-      //   downloadImage("jpg");
-      //   break;
+      case keybinds.downloads.png:
+        downloadImage("png");
+        break;
       case keybinds.downloads.svg:
-        downloadSVG();
+        downloadImage("svg");
         break;
     }
 
@@ -398,7 +397,7 @@
     rendered_svg = null;
   }
 
-  function downloadSVG() {
+  function downloadImage(filetype, width, height) {
     const d = new Date();
     let timestamp = `${d.getFullYear()}`;
     timestamp += `-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -407,14 +406,39 @@
     timestamp += `-${String(d.getMinutes()).padStart(2, "0")}`;
     timestamp += `-${String(d.getSeconds()).padStart(2, "0")}`;
 
-    const url = URL.createObjectURL(
-      new Blob([serialized_svg], { type: "image+svg/xml;charset=utf-8" }),
-    );
+    let url;
+
+    if (filetype === "svg") {
+      url = URL.createObjectURL(
+        new Blob([serialized_svg], { type: "image/svg+xml;charset=utf-8" }),
+      );
+    } else {
+      url = rasterizeSVG(filetype, width, height);
+    }
 
     const link = document.createElement("a");
-    link.setAttribute("download", `ssvgg_${timestamp}.svg`);
+    link.setAttribute("download", `ssvgg_${timestamp}.${filetype}`);
     link.setAttribute("href", url);
     link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function rasterizeSVG(filetype, width, height) {
+    const cnv = document.createElement("canvas");
+    cnv.width = grid.x * spacing.scaled;
+    cnv.height = grid.y * spacing.scaled;
+
+    cnv
+      .getContext("2d")
+      .drawImage(
+        rendered_svg,
+        0,
+        0,
+        grid.x * spacing.scaled,
+        grid.y * spacing.scaled,
+      );
+
+    return cnv.toDataURL(`image/${filetype}`);
   }
 </script>
 

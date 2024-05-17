@@ -18,6 +18,7 @@ export const shapes = {
   ellipse: "x",
 }
 
+// TODO bind behind ctrl key being held
 export const downloads = {
   png: "c",
   jpg: "v",
