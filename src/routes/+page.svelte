@@ -25,6 +25,7 @@
       y: mouse.y + spacing.scaled / 2,
     },
     lastAction,
+    ctrl_down = false,
     preview_points = [],
     // exported svg properties
     // svg html element
@@ -303,34 +304,34 @@
    */
   function keydown(event) {
     if (event.repeat) return;
+    if (event.key === "Control") return (ctrl_down = true);
 
+    if (event.ctrlKey) calcCtrlLayerKeys(event);
+    else calcBaseLayerKeys(event);
+  }
+
+  function calcBaseLayerKeys(event) {
     switch (event.key) {
-      case keybinds.paths.line:
+      case keybinds.base_layer.line:
         if (preview_points.length < 2) break;
         setPathType("L");
         break;
-      case keybinds.paths.arc:
+      case keybinds.base_layer.arc:
         if (preview_points.length < 2) break;
         setPathType("A1");
         break;
-      case keybinds.paths.arc_rev:
+      case keybinds.base_layer.arc_rev:
         if (preview_points.length < 2) break;
         setPathType("A0");
         break;
-      case keybinds.paths.bezier_quad:
+      case keybinds.base_layer.bezier_quad:
         if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
         setPathType("Q");
         break;
-      case keybinds.paths.bezier_cube:
+      case keybinds.base_layer.bezier_cube:
         if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
           break;
         setPathType("C");
-        break;
-      case keybinds.downloads.png:
-        downloadImage("png");
-        break;
-      case keybinds.downloads.svg:
-        downloadImage("svg");
         break;
     }
 
@@ -397,6 +398,26 @@
     rendered_svg = null;
   }
 
+  function calcCtrlLayerKeys(event) {
+    switch (event.key) {
+      case keybinds.ctrl_layer.png:
+        downloadImage("png");
+        break;
+      case keybinds.ctrl_layer.svg:
+        downloadImage("svg");
+        break;
+      case keybinds.ctrl_layer.webp:
+        downloadImage("webp");
+        break;
+      // case keybinds.ctrl_layer.undo:
+      //   undo();
+      //   break;
+      // case keybinds.ctrl_layer.redo:
+      //   redo();
+      //   break;
+    }
+  }
+
   function downloadImage(filetype, width, height) {
     const d = new Date();
     let timestamp = `${d.getFullYear()}`;
@@ -440,12 +461,17 @@
 
     return cnv.toDataURL(`image/${filetype}`);
   }
+
+  function keyup(event) {
+    if (event.key === "Control") ctrl_down = false;
+  }
 </script>
 
 <svelte:window
   bind:innerHeight
   bind:innerWidth
   on:keydown|preventDefault={keydown}
+  on:keyup|preventDefault={keyup}
 />
 
 <!--
@@ -468,16 +494,28 @@ which is used to determine the number of grid markers to show on screen
   />
 
   <div style="grid-area:options" style:background>
-    {#each Object.entries(keybinds.paths) as [key, val]}
-      <button
-        on:click={() => {
-          // runs the same function as a keydown event so uses the same method
-          keydown({ key: val });
-        }}
-      >
-        {key} ({val.toUpperCase()})
-      </button>
-    {/each}
+    {#if ctrl_down}
+      {#each Object.entries(keybinds.ctrl_layer) as [key, val]}
+        <button
+          on:click={() => {
+            keydown({ key: val, ctrlKey: true });
+          }}
+        >
+          {key} ({val.toUpperCase()})
+        </button>
+      {/each}
+    {:else}
+      {#each Object.entries(keybinds.base_layer) as [key, val]}
+        <button
+          on:click={() => {
+            // runs the same function as a keydown event so uses the same method
+            keydown({ key: val });
+          }}
+        >
+          {key} ({val.toUpperCase()})
+        </button>
+      {/each}
+    {/if}
     <button
       on:click={() => {
         grid.shown = !grid.shown;
