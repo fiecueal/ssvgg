@@ -409,6 +409,9 @@
       case keybinds.ctrl_layer.webp:
         downloadImage("webp");
         break;
+      case keybinds.ctrl_layer.show_grid:
+        grid.shown = !grid.shown;
+        break;
       // case keybinds.ctrl_layer.undo:
       //   undo();
       //   break;
@@ -516,13 +519,6 @@ which is used to determine the number of grid markers to show on screen
         </button>
       {/each}
     {/if}
-    <button
-      on:click={() => {
-        grid.shown = !grid.shown;
-      }}
-    >
-      show grid: {grid.shown}
-    </button>
 
     {#if dev}
       <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
