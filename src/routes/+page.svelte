@@ -496,29 +496,33 @@ which is used to determine the number of grid markers to show on screen
     on:contextmenu|preventDefault
   />
 
-  <div style="grid-area:options" style:background>
-    {#if ctrl_down}
-      {#each Object.entries(keybinds.ctrl_layer) as [key, val]}
+  <div style="grid-area:actions" style:background>
+    <div id="keyboard">
+      {#each Object.entries(ctrl_down ? keybinds.ctrl_layer : keybinds.base_layer) as [action, bind], i}
         <button
+          style:grid-area={bind}
           on:click={() => {
-            keydown({ key: val, ctrlKey: true });
+            keydown({ key: bind, ctrlKey: ctrl_down });
           }}
         >
-          {key} ({val.toUpperCase()})
+          {action} ({bind.toUpperCase()})
         </button>
       {/each}
-    {:else}
-      {#each Object.entries(keybinds.base_layer) as [key, val]}
-        <button
-          on:click={() => {
-            // runs the same function as a keydown event so uses the same method
-            keydown({ key: val });
-          }}
-        >
-          {key} ({val.toUpperCase()})
-        </button>
+
+      {#each { length: 15 - Object.keys(ctrl_down ? keybinds.ctrl_layer : keybinds.base_layer).length } as _}
+        <button disabled>_____</button>
       {/each}
-    {/if}
+
+      <button
+        class:ctrl_down
+        style="font-family:monospace"
+        on:click={() => {
+          ctrl_down = !ctrl_down;
+        }}
+      >
+        CTRL
+      </button>
+    </div>
 
     {#if dev}
       <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
@@ -541,8 +545,25 @@ which is used to determine the number of grid markers to show on screen
     display: grid;
     grid-template-areas:
       "layers canvas"
-      "options options";
+      "actions actions";
     grid-template-columns: 15rem 1fr;
     grid-template-rows: 1fr 25rem;
+  }
+  #keyboard {
+    width: max-content;
+    margin: 0.25rem;
+    gap: 0.25rem;
+    display: grid;
+    grid-template-areas:
+      "q w e r t"
+      "a s d f g"
+      "z x c v b";
+  }
+  button {
+    width: 4rem;
+    height: 4rem;
+  }
+  .ctrl_down {
+    background-color: grey;
   }
 </style>
