@@ -304,7 +304,7 @@
    */
   function keydown(event) {
     if (event.repeat) return;
-    if (event.key === "Control") return (ctrl_down = true);
+    ctrl_down = event.ctrlKey;
 
     if (event.ctrlKey) calcCtrlLayerKeys(event);
     else calcBaseLayerKeys(event);
@@ -463,7 +463,7 @@
   }
 
   function keyup(event) {
-    if (event.key === "Control") ctrl_down = false;
+    ctrl_down = event.ctrlKey;
   }
 </script>
 
