@@ -1,13 +1,13 @@
 export const base_layer = {
-  linecap: "q",
-  linejoin: "w",
+  q: "linecap",
+  w: "linejoin",
   // close: "e",
   // fill: "r",
-  line: "a",
-  arc: "s",
-  arc_rev: "d",
-  bezier_quad: "f",
-  bezier_cube: "g",
+  a: "line",
+  s: "arc",
+  d: "arc_rev",
+  f: "bezier_quad",
+  g: "bezier_cube",
   // rect: "z",
   // ellipse: "x",
   // clear_preview_points: "c",
@@ -15,10 +15,10 @@ export const base_layer = {
 
 // TODO bind behind ctrl key being held
 export const ctrl_layer = {
-  show_grid: "e",
-  redo: "r",
-  webp: "a",
-  png: "s",
-  svg: "d",
-  undo: "z",
+  e: "show_grid",
+  a: "webp",
+  s: "png",
+  d: "svg",
+  z: "undo",
+  x: "redo",
 }

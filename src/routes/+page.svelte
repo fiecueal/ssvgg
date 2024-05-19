@@ -40,6 +40,8 @@
     fill = "none",
     stroke = "#000";
 
+  $: active_keybinds = ctrl_down ? keybinds.ctrl_layer : keybinds.base_layer;
+
   onMount(() => {
     context = canvas.getContext("2d");
     // initialize first path for the svg
@@ -311,24 +313,24 @@
   }
 
   function calcBaseLayerKeys(event) {
-    switch (event.key) {
-      case keybinds.base_layer.line:
+    switch (keybinds.base_layer[event.key]) {
+      case "line":
         if (preview_points.length < 2) break;
         setPathType("L");
         break;
-      case keybinds.base_layer.arc:
+      case "arc":
         if (preview_points.length < 2) break;
         setPathType("A1");
         break;
-      case keybinds.base_layer.arc_rev:
+      case "arc_rev":
         if (preview_points.length < 2) break;
         setPathType("A0");
         break;
-      case keybinds.base_layer.bezier_quad:
+      case "bezier_quad":
         if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
         setPathType("Q");
         break;
-      case keybinds.base_layer.bezier_cube:
+      case "bezier_cube":
         if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
           break;
         setPathType("C");
@@ -399,17 +401,13 @@
   }
 
   function calcCtrlLayerKeys(event) {
-    switch (event.key) {
-      case keybinds.ctrl_layer.png:
-        downloadImage("png");
+    switch (keybinds.ctrl_layer[event.key]) {
+      case "png":
+      case "svg":
+      case "webp":
+        downloadImage(keybinds.ctrl_layer[event.key]);
         break;
-      case keybinds.ctrl_layer.svg:
-        downloadImage("svg");
-        break;
-      case keybinds.ctrl_layer.webp:
-        downloadImage("webp");
-        break;
-      case keybinds.ctrl_layer.show_grid:
+      case "show_grid":
         grid.shown = !grid.shown;
         break;
       // case keybinds.ctrl_layer.undo:
@@ -498,19 +496,18 @@ which is used to determine the number of grid markers to show on screen
 
   <div style="grid-area:actions" style:background>
     <div id="keyboard">
-      {#each Object.entries(ctrl_down ? keybinds.ctrl_layer : keybinds.base_layer) as [action, bind], i}
-        <button
-          style:grid-area={bind}
-          on:click={() => {
-            keydown({ key: bind, ctrlKey: ctrl_down });
-          }}
-        >
-          {action} ({bind.toUpperCase()})
-        </button>
-      {/each}
-
-      {#each { length: 15 - Object.keys(ctrl_down ? keybinds.ctrl_layer : keybinds.base_layer).length } as _}
-        <button disabled>_____</button>
+      {#each "qwertasdfgzxcvb".split("") as bind}
+        {#if active_keybinds[bind]}
+          <button
+            on:click={() => {
+              keydown({ key: bind, ctrlKey: ctrl_down });
+            }}
+          >
+            {active_keybinds[bind]} ({bind.toUpperCase()})
+          </button>
+        {:else}
+          <button disabled>_____</button>
+        {/if}
       {/each}
 
       <button
@@ -554,10 +551,16 @@ which is used to determine the number of grid markers to show on screen
     margin: 0.25rem;
     gap: 0.25rem;
     display: grid;
-    grid-template-areas:
-      "q w e r t"
-      "a s d f g"
-      "z x c v b";
+    grid-template-columns: repeat(5, 4rem);
+
+    & button:nth-child(n + 6):not(:nth-child(n + 11)) {
+      margin-left: 1rem;
+      margin-right: -1rem;
+    }
+    & button:nth-child(n + 11):not(:nth-child(n + 16)) {
+      margin-left: 3rem;
+      margin-right: -3rem;
+    }
   }
   button {
     width: 4rem;
