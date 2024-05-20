@@ -508,7 +508,7 @@ which is used to determine the number of grid markers to show on screen
             {active_keybinds[bind]} ({bind.toUpperCase()})
           </button>
         {:else}
-          <button disabled>_____</button>
+          <button style="font-size: 1.5rem;font-family:monospace" disabled>{bind.toUpperCase()}</button>
         {/if}
       {/each}
 
