@@ -483,8 +483,10 @@ which is used to determine the number of grid markers to show on screen
 <div id="container">
   <div style="grid-area:layers" style:background>add stuff here later</div>
 
+  <!-- hard coded width and height because of
+  rendering difference across diff browsers -->
   <canvas
-    style="grid-area:canvas;width:100%;height:100%"
+    style="grid-area:canvas;width:calc(100vw - 16.5rem);height:calc(100vh - 26.5rem)"
     style:background
     bind:this={canvas}
     on:mousemove={mousemove}
