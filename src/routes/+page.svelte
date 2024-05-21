@@ -18,12 +18,6 @@
     mouse = { x: 0, y: 0 },
     cursor = { x: 1, y: 1 },
     click = { x: null, y: null, button: null, held: null },
-    // TODO: the setup with offset var sucks, change later
-    // offset to make mouse pointer accurate to the position of the grid cursor circle
-    offset = {
-      x: mouse.x + spacing.scaled / 2,
-      y: mouse.y + spacing.scaled / 2,
-    },
     lastAction,
     ctrl_down = false,
     preview_points = [],
@@ -170,10 +164,9 @@
   function drawCursor() {
     context.beginPath();
     context.lineWidth = scale.val;
-    // offset aligns the grid cursor to the mouse pointer
     context.arc(
-      offset.x - (offset.x % spacing.scaled) + 0.5,
-      offset.y - (offset.y % spacing.scaled) + 0.5,
+      cursor.x * spacing.scaled,
+      cursor.y * spacing.scaled,
       spacing.scaled / 2,
       0,
       2 * Math.PI,
@@ -189,13 +182,14 @@
   function mousemove(event) {
     mouse.x = Math.trunc(event.clientX - rect.left);
     mouse.y = Math.trunc(event.clientY - rect.top);
-    offset = {
-      x: mouse.x + spacing.scaled / 2,
-      y: mouse.y + spacing.scaled / 2,
-    };
 
-    const x = (offset.x - (offset.x % spacing.scaled)) / spacing.scaled;
-    const y = (offset.y - (offset.y % spacing.scaled)) / spacing.scaled;
+    let x = Math.round(mouse.x / spacing.scaled);
+    let y = Math.round(mouse.y / spacing.scaled);
+
+    if (x >= grid.x) x = grid.x - 1;
+    else if (x <= 0) x = 1;
+    if (y >= grid.y) y = grid.y - 1;
+    else if (y <= 0) y = 1;
 
     if (cursor.x !== x || cursor.y !== y) {
       cursor.x = x;
@@ -304,7 +298,6 @@
   /**
    * also used when buttons are clicked
    * runs other methods based on which key pressed
-   * https://100r.co/site/dotgrid.html#shortcut_quick_list
    */
   function keydown(event) {
     if (event.repeat) return;
