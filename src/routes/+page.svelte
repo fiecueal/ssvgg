@@ -52,7 +52,6 @@
     layers[current_layer].path.setAttribute("fill", fill);
     layers[current_layer].path.setAttribute("stroke", stroke);
     layers[current_layer].path.setAttribute("d", "");
-    layers[current_layer].path.setAttribute("stroke-miterlimit", 20);
     // initialize svg
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -318,10 +317,8 @@
   function calcBaseLayerKeys(event) {
     switch (keybinds.base_layer[event.key]) {
       case "linecap":
-        updateLinecap();
-        break;
       case "linejoin":
-        updateLinejoin();
+        updateStrokeEnds(keybinds.base_layer[event.key]);
         break;
       case "line":
         if (preview_points.length < 2) break;
@@ -350,34 +347,27 @@
     draw();
   }
 
-  function updateLinecap() {
-    switch (layers[current_layer].path.getAttribute("stroke-linecap")) {
+  /**
+   * cycles through different linejoin or linecap types:
+   * linejoins: miter | round | bevel
+   * linecaps: butt | round | square
+   * default linejoin gets a stroke-miterlimit attribute
+   */
+  function updateStrokeEnds(attr) {
+    const second_type = attr === "linecap" ? "square" : "bevel";
+
+    switch (layers[current_layer].path.getAttribute(`stroke-${attr}`)) {
       case "square": // default is "butt" so remove attr when switching to butt
-        layers[current_layer].path.removeAttribute("stroke-linecap");
+      case "bevel": // default is "miter" so remove attr when switching to miter
+        layers[current_layer].path.removeAttribute(`stroke-${attr}`);
         break;
       case "round":
-        layers[current_layer].path.setAttribute("stroke-linecap", "square");
+        layers[current_layer].path.setAttribute(`stroke-${attr}`, second_type);
         break;
       case "butt":
-      default:
-        layers[current_layer].path.setAttribute("stroke-linecap", "round");
-        break;
-    }
-  }
-
-  function updateLinejoin() {
-    switch (layers[current_layer].path.getAttribute("stroke-linejoin")) {
-      case "bevel": // default is "miter" so remove attr when switching to miter
-        layers[current_layer].path.removeAttribute("stroke-linejoin");
-        layers[current_layer].path.setAttribute("stroke-miterlimit", 20);
-        break;
-      case "round":
-        layers[current_layer].path.setAttribute("stroke-linejoin", "bevel");
-        break;
       case "miter":
       default:
-        layers[current_layer].path.setAttribute("stroke-linejoin", "round");
-        layers[current_layer].path.removeAttribute("stroke-miterlimit");
+        layers[current_layer].path.setAttribute(`stroke-${attr}`, "round");
         break;
     }
   }
