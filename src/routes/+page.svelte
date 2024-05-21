@@ -316,6 +316,12 @@
 
   function calcBaseLayerKeys(event) {
     switch (keybinds.base_layer[event.key]) {
+      case "linecap":
+        updateLinecap();
+        break;
+      case "linejoin":
+        updateLinejoin();
+        break;
       case "line":
         if (preview_points.length < 2) break;
         setPathType("L");
@@ -341,6 +347,38 @@
 
     setPath();
     draw();
+  }
+
+  function updateLinecap() {
+    switch (layers[current_layer].path.getAttribute("stroke-linecap")) {
+      case "square": // default is "butt" so remove attr when switching to butt
+        layers[current_layer].path.removeAttribute("stroke-linecap");
+        break;
+      case "round":
+        layers[current_layer].path.setAttribute("stroke-linecap", "square");
+        break;
+      case "butt":
+      default:
+        layers[current_layer].path.setAttribute("stroke-linecap", "round");
+        break;
+    }
+  }
+
+  function updateLinejoin() {
+    switch (layers[current_layer].path.getAttribute("stroke-linejoin")) {
+      case "bevel": // default is "miter" so remove attr when switching to miter
+        layers[current_layer].path.removeAttribute("stroke-linejoin");
+        layers[current_layer].path.setAttribute("stroke-miterlimit", 20);
+        break;
+      case "round":
+        layers[current_layer].path.setAttribute("stroke-linejoin", "bevel");
+        break;
+      case "miter":
+      default:
+        layers[current_layer].path.setAttribute("stroke-linejoin", "round");
+        layers[current_layer].path.removeAttribute("stroke-miterlimit");
+        break;
+    }
   }
 
   function setPathType(type) {
