@@ -150,6 +150,8 @@
   }
 
   function drawPlacedPoints() {
+    if (!grid.shown) return;
+
     for (const point of layers[current_layer].points) {
       const pos = { x: point.x * spacing.scaled, y: point.y * spacing.scaled };
       context.beginPath();
