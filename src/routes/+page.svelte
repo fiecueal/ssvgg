@@ -52,6 +52,7 @@
     layers[current_layer].path.setAttribute("fill", fill);
     layers[current_layer].path.setAttribute("stroke", stroke);
     layers[current_layer].path.setAttribute("d", "");
+    layers[current_layer].path.setAttribute("stroke-miterlimit", 20);
     // initialize svg
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -447,7 +448,7 @@
       case "webp":
         downloadImage(keybinds.ctrl_layer[event.key]);
         break;
-      case "show_grid":
+      case "preview_render":
         grid.shown = !grid.shown;
         break;
       // case keybinds.ctrl_layer.undo:
@@ -538,6 +539,7 @@ which is used to determine the number of grid markers to show on screen
 
   <div style="grid-area:actions" style:background>
     <div id="keyboard">
+      <!-- string represent left side of keyboard where all keybinds are -->
       {#each "qwertasdfgzxcvb".split("") as bind}
         {#if active_keybinds[bind]}
           <button
@@ -548,7 +550,9 @@ which is used to determine the number of grid markers to show on screen
             {active_keybinds[bind]} ({bind.toUpperCase()})
           </button>
         {:else}
-          <button style="font-size: 1.5rem;font-family:monospace" disabled>{bind.toUpperCase()}</button>
+          <button style="font-size:1.5rem;font-family:monospace" disabled>
+            {bind.toUpperCase()}
+          </button>
         {/if}
       {/each}
 

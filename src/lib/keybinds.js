@@ -10,15 +10,13 @@ export const base_layer = {
   g: "bezier_cube",
   // rect: "z",
   // ellipse: "x",
-  // clear_preview_points: "c",
 }
 
-// TODO bind behind ctrl key being held
 export const ctrl_layer = {
-  e: "show_grid",
   a: "webp",
   s: "png",
   d: "svg",
   z: "undo",
   x: "redo",
+  c: "preview_render",
 }
