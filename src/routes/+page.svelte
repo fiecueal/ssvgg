@@ -204,6 +204,9 @@
    * secondary - select point to delete if on top of one
    */
   function mousedown(event) {
+    if (click.button) return;
+    click.button = event.button;
+
     switch (event.button) {
       case 0:
         click.x = cursor.x;
@@ -232,6 +235,9 @@
    * secondary - delete point
    */
   function mouseup(event) {
+    if (click.button !== event.button) return;
+    click.button = null;
+
     switch (event.button) {
       case 0:
         if (
