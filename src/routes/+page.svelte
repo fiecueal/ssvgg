@@ -209,23 +209,27 @@
 
     switch (event.button) {
       case 0:
-        click.x = cursor.x;
-        click.y = cursor.y;
-
-        for (const point of layers[current_layer].points) {
-          if (point.x === cursor.x && point.y === cursor.y) {
-            click.held = point;
-          }
-        }
-
+        setHeldPoint();
         lastAction = "primary down";
         break;
       case 1:
         lastAction = "middle down";
         break;
       case 2:
+        setHeldPoint();
         lastAction = "secondary down";
         break;
+    }
+  }
+
+  function setHeldPoint() {
+    click.x = cursor.x;
+    click.y = cursor.y;
+
+    for (const point of layers[current_layer].points) {
+      if (point.x === cursor.x && point.y === cursor.y) {
+        click.held = point;
+      }
     }
   }
 
