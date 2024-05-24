@@ -18,7 +18,6 @@
     mouse = { x: 0, y: 0 },
     cursor = { x: 1, y: 1 },
     click = { x: null, y: null, button: null, held: null },
-    lastAction,
     ctrl_down = false,
     preview_points = [],
     // exported svg properties
@@ -210,14 +209,11 @@
     switch (event.button) {
       case 0:
         setHeldPoint();
-        lastAction = "primary down";
         break;
       case 1:
-        lastAction = "middle down";
         break;
       case 2:
         setHeldPoint();
-        lastAction = "secondary down";
         break;
     }
   }
@@ -252,16 +248,13 @@
         } else {
           moveHeldPoint();
         }
-        click.held = null;
-        lastAction = "primary up";
         break;
       case 1:
-        lastAction = "middle up";
         break;
       case 2:
-        lastAction = "secondary up";
         break;
     }
+    click.held = null;
   }
 
   function addPreviewPoint() {
@@ -564,7 +557,6 @@ which is used to determine the number of grid markers to show on screen
       <p style:margin="0">grid size: x: {grid.x}, y: {grid.y}</p>
       <p style:margin="0">mouse pos: x: {mouse.x}, y: {mouse.y}</p>
       <p style:margin="0">cursor pos: x: {cursor.x}, y: {cursor.y}</p>
-      <p style:margin="0">last action: {lastAction}</p>
       <p style:margin="0">scale: {scale.val}</p>
 
       {@html serialized_svg}
