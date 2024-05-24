@@ -252,6 +252,13 @@
       case 1:
         break;
       case 2:
+        if (
+          click.held &&
+          click.held.x === cursor.x &&
+          click.held.y === cursor.y
+        ) {
+          deleteHeldPoint();
+        }
         break;
     }
     click.held = null;
@@ -279,6 +286,41 @@
   function moveHeldPoint() {
     click.held.x = cursor.x;
     click.held.y = cursor.y;
+    setPath();
+    draw();
+  }
+
+  function deleteHeldPoint() {
+    const points = layers[current_layer].points;
+    const i = points.indexOf(click.held);
+
+    switch (points[i].type.charAt(0)) {
+      case "M":
+        if (points[i + 1]) {
+          if (points[i + 1].type.charAt(0) === "Q") {
+            points.splice(i, 2); // remove "M", "Q1"
+          } else if (points[i + 1].type.charAt(0) === "C") {
+            points.splice(i, 3); // remove "M", "C1", "C2"
+          } else {
+            points.splice(i, 1); // remove "M"
+          }
+          points[i].type = "M"; // make sure no path starts without an "M"
+        } else {
+          points.splice(i, 1); // remove "M"
+        }
+        break;
+      case "Q":
+      case "C":
+        if (points[i].type.charAt(1) !== "0") return;
+        if (points[i].type.charAt(0) === "Q") {
+          points.splice(i - 1, 2);
+        } else {
+          points.splice(i - 2, 3);
+        }
+        break;
+      default:
+        points.splice(i, 1);
+    }
     setPath();
     draw();
   }
@@ -381,11 +423,15 @@
         break;
       case "Q":
         for (let i = 1; i < preview_points.length; i++) {
+          // Q0 = end point
+          // Q1 = control point
           preview_points[i].type = "Q" + (i % 2);
         }
         break;
       case "C":
         for (let i = 1; i < preview_points.length; i++) {
+          // C0 = end point
+          // C1/C2 = first/second control point
           preview_points[i].type = "C" + (i % 3);
         }
         break;
@@ -417,6 +463,7 @@
         case "C0":
         case "C1":
         case "C2":
+          // only put a path type on the first control point (C1 or Q1)
           new_d += `${
             Number(point.type.charAt(1)) === 1 ? point.type.charAt(0) : " "
           }${point.x} ${point.y}`;
