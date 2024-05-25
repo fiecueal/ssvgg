@@ -366,15 +366,15 @@
         if (preview_points.length < 2) break;
         setPathType("A1");
         break;
-      case "arc_rev":
+      case "arc rev":
         if (preview_points.length < 2) break;
         setPathType("A0");
         break;
-      case "bezier_quad":
+      case "bezier quad":
         if (preview_points.length < 3 || preview_points.length % 2 === 0) break;
         setPathType("Q");
         break;
-      case "bezier_cube":
+      case "bezier cube":
         if (preview_points.length < 4 || (preview_points.length - 1) % 3 !== 0)
           break;
         setPathType("C");

@@ -5,9 +5,9 @@ export const base_layer = {
   // fill: "r",
   a: "line",
   s: "arc",
-  d: "arc_rev",
-  f: "bezier_quad",
-  g: "bezier_cube",
+  d: "arc rev",
+  f: "bezier quad",
+  g: "bezier cube",
   // rect: "z",
   // ellipse: "x",
 }
@@ -18,5 +18,5 @@ export const ctrl_layer = {
   d: "svg",
   z: "undo",
   x: "redo",
-  c: "preview_render",
+  c: "preview render",
 }
