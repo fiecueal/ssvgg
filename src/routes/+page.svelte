@@ -563,6 +563,17 @@
   />
 
   <div id="actions" style:background>
+    <div id="how_to">
+      <h2>HOW-TO</h2>
+      <ol>
+        <li>place two or more points on the canvas with left click</li>
+        <li>
+          select one of the buttons or press the corresponding key to draw a
+          path based on the points
+        </li>
+      </ol>
+    </div>
+
     <div id="keyboard">
       <!-- string represent left side of keyboard where all keybinds are -->
       {#each "qwertasdfgzxcvb".split("") as bind}
@@ -625,29 +636,35 @@
   #actions {
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+  #how_to {
+    max-width: 25%;
+    height: 100%;
+    font-family: sans-serif;
   }
   #keyboard {
-    width: max-content;
     margin: 0.25rem;
-    margin-right: 3.25rem;
+    padding-right: 3rem;
     gap: 0.25rem;
-    display: inline-grid;
+    display: grid;
     grid-template-columns: repeat(5, 1fr);
 
-    & button:nth-child(n + 6):not(:nth-child(n + 11)) {
+    & button:nth-child(n + 6):nth-child(-n + 10) {
       margin-left: 1rem;
       margin-right: -1rem;
     }
-    & button:nth-child(n + 11):not(:nth-child(n + 16)) {
+    & button:nth-child(n + 11):nth-child(-n + 15) {
       margin-left: 3rem;
       margin-right: -3rem;
     }
   }
   #mouse {
-    width: max-content;
     margin: 0.25rem;
     gap: 0.25rem;
-    display: inline-grid;
+    display: grid;
     grid-template-columns: 1fr 1fr;
   }
   #mouse_left {
@@ -657,17 +674,17 @@
     border-top-right-radius: 2rem;
   }
   #mouse_body {
-    grid-column: span 2;
     width: 8.25rem;
     height: 8.25rem;
+    grid-column: span 2;
     border-bottom-left-radius: 4rem;
     border-bottom-right-radius: 4rem;
   }
   button {
-    border: black 2px solid;
-    border-radius: 0.5rem;
     width: 4rem;
     height: 4rem;
+    border: black 2px solid;
+    border-radius: 0.5rem;
 
     &:hover {
       filter: brightness(0.9);
