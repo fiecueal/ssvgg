@@ -549,18 +549,10 @@
   on:keyup|preventDefault={keyup}
 />
 
-<!--
-width and height style (actual dimensions on client screen)
-differ from width and height attribute(set in draw() function)
-which is used to determine the number of grid markers to show on screen
--->
+<!-- TODO implement layers -->
 <div id="container">
-  <div style="grid-area:layers" style:background>add stuff here later</div>
-
-  <!-- hard coded width and height because of
-  rendering difference across diff browsers -->
   <canvas
-    style="grid-area:canvas;width:calc(100vw - 16.5rem);height:calc(100vh - 26.5rem)"
+    id="canvas"
     style:background
     bind:this={canvas}
     on:mousemove={mousemove}
@@ -570,7 +562,7 @@ which is used to determine the number of grid markers to show on screen
     on:contextmenu|preventDefault
   />
 
-  <div style="grid-area:actions" style:background>
+  <div id="actions" style:background>
     <div id="keyboard">
       <!-- string represent left side of keyboard where all keybinds are -->
       {#each "qwertasdfgzxcvb".split("") as bind}
@@ -591,7 +583,6 @@ which is used to determine the number of grid markers to show on screen
 
       <button
         class:ctrl_down
-        style="font-family:monospace"
         on:click={() => {
           ctrl_down = !ctrl_down;
         }}
@@ -599,6 +590,7 @@ which is used to determine the number of grid markers to show on screen
         CTRL
       </button>
     </div>
+
     <div id="mouse">
       <button id="mouse_left" disabled>place point</button>
       <button id="mouse_right" disabled>delete point</button>
@@ -623,11 +615,16 @@ which is used to determine the number of grid markers to show on screen
     margin: 0.5rem;
     gap: 0.5rem;
     display: grid;
-    grid-template-areas:
-      "layers canvas"
-      "actions actions";
-    grid-template-columns: 15rem 1fr;
-    grid-template-rows: 1fr 25rem;
+    grid-template-rows: 1fr max-content;
+  }
+  #canvas {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  #actions {
+    width: 100%;
+    height: 100%;
   }
   #keyboard {
     width: max-content;
@@ -635,7 +632,7 @@ which is used to determine the number of grid markers to show on screen
     margin-right: 3.25rem;
     gap: 0.25rem;
     display: inline-grid;
-    grid-template-columns: repeat(5, 4rem);
+    grid-template-columns: repeat(5, 1fr);
 
     & button:nth-child(n + 6):not(:nth-child(n + 11)) {
       margin-left: 1rem;
@@ -672,10 +669,15 @@ which is used to determine the number of grid markers to show on screen
     width: 4rem;
     height: 4rem;
 
+    &:hover {
+      filter: brightness(0.9);
+    }
+    &:active {
+      filter: brightness(0.8);
+    }
     &:disabled {
       filter: brightness(0.7);
       border: darkgrey 1px solid;
-      font-family: monospace;
     }
   }
   .ctrl_down {
