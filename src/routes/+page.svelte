@@ -583,7 +583,7 @@ which is used to determine the number of grid markers to show on screen
             {active_keybinds[bind]} ({bind.toUpperCase()})
           </button>
         {:else}
-          <button style="font-size:1.5rem;font-family:monospace" disabled>
+          <button style="font-size:1.5rem" disabled>
             {bind.toUpperCase()}
           </button>
         {/if}
@@ -598,6 +598,11 @@ which is used to determine the number of grid markers to show on screen
       >
         CTRL
       </button>
+    </div>
+    <div id="mouse">
+      <button id="mouse_left" disabled>place point</button>
+      <button id="mouse_right" disabled>delete point</button>
+      <button id="mouse_body" disabled>MOUSE</button>
     </div>
 
     {#if dev}
@@ -627,8 +632,9 @@ which is used to determine the number of grid markers to show on screen
   #keyboard {
     width: max-content;
     margin: 0.25rem;
+    margin-right: 3.25rem;
     gap: 0.25rem;
-    display: grid;
+    display: inline-grid;
     grid-template-columns: repeat(5, 4rem);
 
     & button:nth-child(n + 6):not(:nth-child(n + 11)) {
@@ -640,11 +646,39 @@ which is used to determine the number of grid markers to show on screen
       margin-right: -3rem;
     }
   }
+  #mouse {
+    width: max-content;
+    margin: 0.25rem;
+    gap: 0.25rem;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  #mouse_left {
+    border-top-left-radius: 2rem;
+  }
+  #mouse_right {
+    border-top-right-radius: 2rem;
+  }
+  #mouse_body {
+    grid-column: span 2;
+    width: 8.25rem;
+    height: 8.25rem;
+    border-bottom-left-radius: 4rem;
+    border-bottom-right-radius: 4rem;
+  }
   button {
+    border: black 2px solid;
+    border-radius: 0.5rem;
     width: 4rem;
     height: 4rem;
+
+    &:disabled {
+      filter: brightness(0.7);
+      border: darkgrey 1px solid;
+      font-family: monospace;
+    }
   }
   .ctrl_down {
-    background-color: grey;
+    filter: brightness(0.8);
   }
 </style>
