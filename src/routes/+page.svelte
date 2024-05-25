@@ -481,7 +481,7 @@
       case "webp":
         downloadImage(keybinds.ctrl_layer[event.key]);
         break;
-      case "preview_render":
+      case "preview render":
         grid.shown = !grid.shown;
         break;
       // case keybinds.ctrl_layer.undo:
